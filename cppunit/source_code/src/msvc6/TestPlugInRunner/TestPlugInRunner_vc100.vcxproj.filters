@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{a100b7ec-e732-46c5-830c-7d55c6fe2280}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Gui">
+      <UniqueIdentifier>{78920cec-ee48-4a53-85c2-effc178d3af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{c5c0b909-4f3f-47dc-ae76-5b3fc622b1b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models">
+      <UniqueIdentifier>{7cb5b941-3dfe-43f7-983e-1d4ab71e8db6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestRunner-Was-In-Dll">
+      <UniqueIdentifier>{485742ca-a7cb-453b-89e6-6b2de2ac827b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestRunner-Was-In-Dll\UserInterface">
+      <UniqueIdentifier>{f8988308-28c0-492b-afa1-d7ec20e95ca7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestRunner-Was-In-Dll\UserInterface\DynamicWindow">
+      <UniqueIdentifier>{8c6e48d4-c71e-4a31-b0f2-c98471467085}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestRunner-Was-In-Dll\Components">
+      <UniqueIdentifier>{284565a1-41f2-4ff1-ae7e-d72b52f734c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestRunner-Was-In-Dll\NewFiles">
+      <UniqueIdentifier>{2911900d-cee5-40cc-a133-4e1d9522500d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\errortype.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\test_type.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TestRunner\res\test_type.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\TestPlugInRunner.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\TestPlugInRunner.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="TestPlugInRunnerApp.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="TestPlugInRunnerDlg.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\msvc6\TestRunner\TestPlugInInterface.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="TestPlugIn.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="TestPlugInException.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="TestPlugInRunnerModel.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\ListCtrlFormatter.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\ListCtrlSetter.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\MsDevCallerListCtrl.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\ProgressBar.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\ResourceLoaders.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\TestRunnerDlg.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\TreeHierarchyDlg.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\cdxCDynamicBar.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\cdxCDynamicControlsManager.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\cdxCDynamicDialog.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\cdxCDynamicFormView.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\cdxCDynamicPropSheet.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\cdxCDynamicWnd.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\cdxCDynamicWndEx.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\cdxCSizeIconCtrl.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\DynamicWindow\SizeCBar.h">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\ActiveTest.h">
+      <Filter>TestRunner-Was-In-Dll\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\MfcSynchronizationObject.h">
+      <Filter>TestRunner-Was-In-Dll\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\TestRunnerModel.h">
+      <Filter>TestRunner-Was-In-Dll\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TestRunner\MostRecentTests.h">
+      <Filter>TestRunner-Was-In-Dll\NewFiles</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPlugInRunnerApp.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPlugInRunnerDlg.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPlugIn.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPlugInException.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPlugInRunnerModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\ListCtrlFormatter.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\ListCtrlSetter.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\MsDevCallerListCtrl.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\ProgressBar.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\ResourceLoaders.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\TestRunnerDlg.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\TreeHierarchyDlg.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\cdxCDynamicBar.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\cdxCDynamicControlsManager.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\cdxCDynamicDialog.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\cdxCDynamicFormView.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\cdxCDynamicPropSheet.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\cdxCDynamicWnd.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\cdxCDynamicWndEx.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\cdxCSizeIconCtrl.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\DynamicWindow\SizeCBar.cpp">
+      <Filter>TestRunner-Was-In-Dll\UserInterface\DynamicWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\ActiveTest.cpp">
+      <Filter>TestRunner-Was-In-Dll\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\TestRunnerModel.cpp">
+      <Filter>TestRunner-Was-In-Dll\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TestRunner\MostRecentTests.cpp">
+      <Filter>TestRunner-Was-In-Dll\NewFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\include\msvc6\DSPlugin\TestRunnerDSPluginVC6_i.c">
+      <Filter>TestRunner-Was-In-Dll\NewFiles</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TestPlugInRunner.rc">
+      <Filter>Gui</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

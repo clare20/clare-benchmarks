@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="cppunit" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Win32 Release">
+				<Option output="..\gcc\Release\libcppunit" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="gcc\Release" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-fexceptions" />
+					<Add option="-O2" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_MBCS" />
+					<Add option="-D_LIB" />
+					<Add directory="..\..\include" />
+				</Compiler>
+				<ExtraCommands>
+					<Add after='copy &quot;$(TargetPath)&quot; ..\..\lib\gcc\$(TargetName).lib' />
+				</ExtraCommands>
+			</Target>
+			<Target title="Win32 Debug">
+				<Option output="..\gcc\Debug\libcppunit" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="gcc\Debug" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-fexceptions" />
+					<Add option="-g" />
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_MBCS" />
+					<Add option="-D_LIB" />
+					<Add directory="..\..\include" />
+				</Compiler>
+				<ExtraCommands>
+					<Add after='copy &quot;$(TargetPath)&quot; ..\..\lib\gcc\$(TargetName).lib' />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Unit filename="BriefTestProgressListener.cpp" />
+		<Unit filename="..\..\include\cppunit\BriefTestProgressListener.h" />
+		<Unit filename="TestResultCollector.cpp" />
+		<Unit filename="..\..\include\cppunit\TestResultCollector.h" />
+		<Unit filename="TestSuccessListener.cpp" />
+		<Unit filename="TextTestProgressListener.cpp" />
+		<Unit filename="..\..\include\cppunit\TextTestProgressListener.h" />
+		<Unit filename="TextTestResult.cpp" />
+		<Unit filename="..\..\include\cppunit\TextTestResult.h" />
+		<Unit filename="..\..\include\cppunit\ui\text\TestRunner.h" />
+		<Unit filename="TextTestRunner.cpp" />
+		<Unit filename="..\..\include\cppunit\TextTestRunner.h" />
+		<Unit filename="..\..\include\cppunit\ui\text\TextTestRunner.h" />
+		<Unit filename="..\..\include\cppunit\config\config-bcb5.h" />
+		<Unit filename="..\..\include\cppunit\config\config-evc4.h" />
+		<Unit filename="..\..\include\cppunit\config\config-mac.h" />
+		<Unit filename="..\..\include\cppunit\config\config-msvc6.h" />
+		<Unit filename="..\..\include\cppunit\config\CppUnitApi.h" />
+		<Unit filename="..\..\include\cppunit\portability\CppUnitDeque.h" />
+		<Unit filename="..\..\include\cppunit\portability\CppUnitMap.h" />
+		<Unit filename="..\..\include\cppunit\portability\CppUnitSet.h" />
+		<Unit filename="..\..\include\cppunit\portability\CppUnitStack.h" />
+		<Unit filename="..\..\include\cppunit\portability\CppUnitVector.h" />
+		<Unit filename="..\..\include\cppunit\portability\FloatingPoint.h" />
+		<Unit filename="..\..\include\cppunit\Portability.h" />
+		<Unit filename="..\..\include\cppunit\config\SelectDllLoader.h" />
+		<Unit filename="..\..\include\cppunit\config\SourcePrefix.h" />
+		<Unit filename="..\..\include\cppunit\portability\Stream.h" />
+		<Unit filename="CompilerOutputter.cpp" />
+		<Unit filename="..\..\include\cppunit\CompilerOutputter.h" />
+		<Unit filename="..\..\include\cppunit\Outputter.h" />
+		<Unit filename="TextOutputter.cpp" />
+		<Unit filename="..\..\include\cppunit\TextOutputter.h" />
+		<Unit filename="XmlOutputter.cpp" />
+		<Unit filename="..\..\include\cppunit\XmlOutputter.h" />
+		<Unit filename="XmlOutputterHook.cpp" />
+		<Unit filename="..\..\include\cppunit\XmlOutputterHook.h" />
+		<Unit filename="AdditionalMessage.cpp" />
+		<Unit filename="..\..\include\cppunit\AdditionalMessage.h" />
+		<Unit filename="Asserter.cpp" />
+		<Unit filename="..\..\include\cppunit\Asserter.h" />
+		<Unit filename="Exception.cpp" />
+		<Unit filename="..\..\include\cppunit\Exception.h" />
+		<Unit filename="Message.cpp" />
+		<Unit filename="..\..\include\cppunit\Message.h" />
+		<Unit filename="SourceLine.cpp" />
+		<Unit filename="..\..\include\cppunit\SourceLine.h" />
+		<Unit filename="SynchronizedObject.cpp" />
+		<Unit filename="..\..\include\cppunit\SynchronizedObject.h" />
+		<Unit filename="Test.cpp" />
+		<Unit filename="..\..\include\cppunit\Test.h" />
+		<Unit filename="TestAssert.cpp" />
+		<Unit filename="..\..\include\cppunit\TestAssert.h" />
+		<Unit filename="TestCase.cpp" />
+		<Unit filename="..\..\include\cppunit\TestCase.h" />
+		<Unit filename="TestComposite.cpp" />
+		<Unit filename="..\..\include\cppunit\TestComposite.h" />
+		<Unit filename="TestFailure.cpp" />
+		<Unit filename="..\..\include\cppunit\TestFailure.h" />
+		<Unit filename="..\..\include\cppunit\TestFixture.h" />
+		<Unit filename="TestLeaf.cpp" />
+		<Unit filename="..\..\include\cppunit\TestLeaf.h" />
+		<Unit filename="..\..\include\cppunit\TestListener.h" />
+		<Unit filename="TestPath.cpp" />
+		<Unit filename="..\..\include\cppunit\TestPath.h" />
+		<Unit filename="TestResult.cpp" />
+		<Unit filename="..\..\include\cppunit\TestResult.h" />
+		<Unit filename="TestRunner.cpp" />
+		<Unit filename="..\..\include\cppunit\TestRunner.h" />
+		<Unit filename="TestSuite.cpp" />
+		<Unit filename="..\..\include\cppunit\TestSuite.h" />
+		<Unit filename="..\..\include\cppunit\extensions\AutoRegisterSuite.h" />
+		<Unit filename="..\..\include\cppunit\extensions\HelperMacros.h" />
+		<Unit filename="..\..\include\cppunit\TestCaller.h" />
+		<Unit filename="..\..\include\cppunit\extensions\TestFactory.h" />
+		<Unit filename="TestFactoryRegistry.cpp" />
+		<Unit filename="..\..\include\cppunit\extensions\TestFactoryRegistry.h" />
+		<Unit filename="..\..\include\cppunit\extensions\TestFixtureFactory.h" />
+		<Unit filename="TestNamer.cpp" />
+		<Unit filename="..\..\include\cppunit\extensions\TestNamer.h" />
+		<Unit filename="TestSuiteBuilderContext.cpp" />
+		<Unit filename="..\..\include\cppunit\extensions\TestSuiteBuilderContext.h" />
+		<Unit filename="..\..\include\cppunit\extensions\TestSuiteFactory.h" />
+		<Unit filename="TypeInfoHelper.cpp" />
+		<Unit filename="..\..\include\cppunit\extensions\TypeInfoHelper.h" />
+		<Unit filename="..\..\include\cppunit\extensions\ExceptionTestCaseDecorator.h" />
+		<Unit filename="..\..\include\cppunit\extensions\Orthodox.h" />
+		<Unit filename="RepeatedTest.cpp" />
+		<Unit filename="..\..\include\cppunit\extensions\RepeatedTest.h" />
+		<Unit filename="TestCaseDecorator.cpp" />
+		<Unit filename="..\..\include\cppunit\extensions\TestCaseDecorator.h" />
+		<Unit filename="TestDecorator.cpp" />
+		<Unit filename="..\..\include\cppunit\extensions\TestDecorator.h" />
+		<Unit filename="TestSetUp.cpp" />
+		<Unit filename="..\..\include\cppunit\extensions\TestSetUp.h" />
+		<Unit filename="BeOsDynamicLibraryManager.cpp" />
+		<Unit filename="DynamicLibraryManager.cpp" />
+		<Unit filename="..\..\include\cppunit\plugin\DynamicLibraryManager.h" />
+		<Unit filename="DynamicLibraryManagerException.cpp" />
+		<Unit filename="..\..\include\cppunit\plugin\DynamicLibraryManagerException.h" />
+		<Unit filename="PlugInManager.cpp" />
+		<Unit filename="..\..\include\cppunit\plugin\PlugInManager.h" />
+		<Unit filename="PlugInParameters.cpp" />
+		<Unit filename="..\..\include\cppunit\plugin\PlugInParameters.h" />
+		<Unit filename="ShlDynamicLibraryManager.cpp" />
+		<Unit filename="..\..\include\cppunit\plugin\TestPlugIn.h" />
+		<Unit filename="TestPlugInDefaultImpl.cpp" />
+		<Unit filename="..\..\include\cppunit\plugin\TestPlugInDefaultImpl.h" />
+		<Unit filename="UnixDynamicLibraryManager.cpp" />
+		<Unit filename="Win32DynamicLibraryManager.cpp" />
+		<Unit filename="..\..\include\cppunit\tools\Algorithm.h" />
+		<Unit filename="StringTools.cpp" />
+		<Unit filename="..\..\include\cppunit\tools\StringTools.h" />
+		<Unit filename="XmlDocument.cpp" />
+		<Unit filename="..\..\include\cppunit\tools\XmlDocument.h" />
+		<Unit filename="XmlElement.cpp" />
+		<Unit filename="..\..\include\cppunit\tools\XmlElement.h" />
+		<Unit filename="DefaultProtector.cpp" />
+		<Unit filename="DefaultProtector.h" />
+		<Unit filename="Protector.cpp" />
+		<Unit filename="..\..\include\cppunit\Protector.h" />
+		<Unit filename="ProtectorChain.cpp" />
+		<Unit filename="ProtectorChain.h" />
+		<Unit filename="ProtectorContext.h" />
+		<Unit filename="..\..\configure.in" />
+		<Unit filename="..\..\INSTALL-WIN32.txt" />
+		<Unit filename="..\..\include\cppunit\Makefile.am" />
+		<Unit filename="Makefile.am" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,494 @@
+﻿Build started 2/23/2020 5:46:12 AM.
+Project "C:\Work\cppunit-1.12.1\src\cppunit\cppunit_dll_vc100.vcxproj" on node 2 (build target(s)).
+InitializeBuildStatus:
+  Creating ".\vc100\Release\dll\cppunit_dll.unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\include /Zi /nologo /W3 /WX- /O1 /Ob0 /Oy- /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D CPPUNIT_BUILD_DLL /D _VC80_UPGRADE=0x0600 /D _WINDLL /D _MBCS /GF /Gm- /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo".\vc100\Release\dll/" /Fd".\vc100\Release\dll/vc100.pdb" /Gd /TP /analyze- /errorReport:prompt DllMain.cpp RepeatedTest.cpp TestCaseDecorator.cpp TestDecorator.cpp TestSetUp.cpp TestFactoryRegistry.cpp TestNamer.cpp TestSuiteBuilderContext.cpp TypeInfoHelper.cpp AdditionalMessage.cpp Asserter.cpp Exception.cpp Message.cpp SourceLine.cpp SynchronizedObject.cpp Test.cpp TestAssert.cpp TestCase.cpp TestComposite.cpp TestFailure.cpp TestLeaf.cpp TestPath.cpp TestResult.cpp TestRunner.cpp TestSuite.cpp CompilerOutputter.cpp TestResultCollector.cpp TextOutputter.cpp XmlOutputter.cpp XmlOutputterHook.cpp TextTestRunner.cpp BriefTestProgressListener.cpp TestSuccessListener.cpp TextTestProgressListener.cpp TextTestResult.cpp BeosDynamicLibraryManager.cpp DynamicLibraryManager.cpp DynamicLibraryManagerException.cpp PlugInManager.cpp PlugInParameters.cpp TestPlugInDefaultImpl.cpp UnixDynamicLibraryManager.cpp Win32DynamicLibraryManager.cpp StringTools.cpp XmlDocument.cpp XmlElement.cpp DefaultProtector.cpp Protector.cpp ProtectorChain.cpp
+  DllMain.cpp
+  RepeatedTest.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestCaseDecorator.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/TestCase.h(50): warning C4251: 'CppUnit::TestCase::m_name' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::TestCase'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  TestDecorator.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestSetUp.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestFactoryRegistry.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestNamer.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/extensions/TestNamer.h(82): warning C4251: 'CppUnit::TestNamer::m_fixtureName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::TestNamer'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  TestSuiteBuilderContext.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/extensions/TestNamer.h(82): warning C4251: 'CppUnit::TestNamer::m_fixtureName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::TestNamer'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  TypeInfoHelper.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  AdditionalMessage.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  Asserter.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  Exception.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  Message.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  SourceLine.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  SynchronizedObject.cpp
+  Test.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestAssert.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  TestCase.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/TestCase.h(50): warning C4251: 'CppUnit::TestCase::m_name' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::TestCase'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  TestComposite.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/TestComposite.h(39): warning C4251: 'CppUnit::TestComposite::m_name' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::TestComposite'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  TestFailure.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  Generating Code...
+  Compiling...
+  TestLeaf.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestPath.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestResult.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+c:\work\cppunit-1.12.1\src\cppunit\ProtectorContext.h(31): warning C4251: 'CppUnit::ProtectorContext::m_shortDescription' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::ProtectorContext'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  TestRunner.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestSuite.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  CompilerOutputter.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/CompilerOutputter.h(138): warning C4251: 'CppUnit::CompilerOutputter::m_locationFormat' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::CompilerOutputter'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  TestResultCollector.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TextOutputter.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  XmlOutputter.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  XmlOutputterHook.cpp
+  TextTestRunner.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  BriefTestProgressListener.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TestSuccessListener.cpp
+  TextTestProgressListener.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  TextTestResult.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  BeosDynamicLibraryManager.cpp
+  DynamicLibraryManager.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  DynamicLibraryManagerException.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  PlugInManager.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/plugin/TestPlugInDefaultImpl.h(27): warning C4275: non dll-interface struct 'CppUnitTestPlugIn' used as base for dll-interface class 'CppUnit::TestPlugInDefaultImpl'
+          C:\Work\cppunit-1.12.1\include\cppunit/plugin/TestPlugIn.h(44) : see declaration of 'CppUnitTestPlugIn'
+          C:\Work\cppunit-1.12.1\include\cppunit/plugin/TestPlugInDefaultImpl.h(26) : see declaration of 'CppUnit::TestPlugInDefaultImpl'
+  PlugInParameters.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/plugin/PlugInParameters.h(27): warning C4251: 'CppUnit::PlugInParameters::m_commandLine' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::PlugInParameters'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  Generating Code...
+  Compiling...
+  TestPlugInDefaultImpl.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/plugin/PlugInParameters.h(27): warning C4251: 'CppUnit::PlugInParameters::m_commandLine' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::PlugInParameters'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/plugin/TestPlugInDefaultImpl.h(27): warning C4275: non dll-interface struct 'CppUnitTestPlugIn' used as base for dll-interface class 'CppUnit::TestPlugInDefaultImpl'
+          C:\Work\cppunit-1.12.1\include\cppunit/plugin/TestPlugIn.h(44) : see declaration of 'CppUnitTestPlugIn'
+          C:\Work\cppunit-1.12.1\include\cppunit/plugin/TestPlugInDefaultImpl.h(26) : see declaration of 'CppUnit::TestPlugInDefaultImpl'
+  UnixDynamicLibraryManager.cpp
+  Win32DynamicLibraryManager.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  StringTools.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  XmlDocument.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  XmlElement.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+  DefaultProtector.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  Protector.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+C:\Work\cppunit-1.12.1\include\cppunit/Exception.h(82): warning C4251: 'CppUnit::Exception::m_whatMessage' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::Exception'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+c:\work\cppunit-1.12.1\src\cppunit\ProtectorContext.h(31): warning C4251: 'CppUnit::ProtectorContext::m_shortDescription' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::ProtectorContext'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  ProtectorChain.cpp
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\xlocale(323): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+C:\Work\cppunit-1.12.1\include\cppunit/SourceLine.h(56): warning C4251: 'CppUnit::SourceLine::m_fileName' : class 'std::basic_string<_Elem,_Traits,_Ax>' needs to have dll-interface to be used by clients of class 'CppUnit::SourceLine'
+          with
+          [
+              _Elem=char,
+              _Traits=std::char_traits<char>,
+              _Ax=std::allocator<char>
+          ]
+  Generating Code...
+ManifestResourceCompile:
+  C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo".\vc100\Release\dll\cppunit_dll.dll.embed.manifest.res" .\vc100\Release\dll\cppunit_dll_manifest.rc 
+Link:
+  C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\vc100\Release\dll\cppunit_dll.dll" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:".\vc100\Release\dll\cppunit_dll.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Work\cppunit-1.12.1\src\cppunit\vc100\Release\dll\cppunit_dll.pdb" /ASSEMBLYDEBUG /TLBID:1 /DYNAMICBASE:NO /IMPLIB:".\vc100\Release\dll/cppunit_dll.lib" /MACHINE:X86 /DLL .\vc100\Release\dll\cppunit_dll.dll.embed.manifest.res
+  .\vc100\Release\dll/DllMain.obj
+  .\vc100\Release\dll/RepeatedTest.obj
+  .\vc100\Release\dll/TestCaseDecorator.obj
+  .\vc100\Release\dll/TestDecorator.obj
+  .\vc100\Release\dll/TestSetUp.obj
+  .\vc100\Release\dll/TestFactoryRegistry.obj
+  .\vc100\Release\dll/TestNamer.obj
+  .\vc100\Release\dll/TestSuiteBuilderContext.obj
+  .\vc100\Release\dll/TypeInfoHelper.obj
+  .\vc100\Release\dll/AdditionalMessage.obj
+  .\vc100\Release\dll/Asserter.obj
+  .\vc100\Release\dll/Exception.obj
+  .\vc100\Release\dll/Message.obj
+  .\vc100\Release\dll/SourceLine.obj
+  .\vc100\Release\dll/SynchronizedObject.obj
+  .\vc100\Release\dll/Test.obj
+  .\vc100\Release\dll/TestAssert.obj
+  .\vc100\Release\dll/TestCase.obj
+  .\vc100\Release\dll/TestComposite.obj
+  .\vc100\Release\dll/TestFailure.obj
+  .\vc100\Release\dll/TestLeaf.obj
+  .\vc100\Release\dll/TestPath.obj
+  .\vc100\Release\dll/TestResult.obj
+  .\vc100\Release\dll/TestRunner.obj
+  .\vc100\Release\dll/TestSuite.obj
+  .\vc100\Release\dll/CompilerOutputter.obj
+  .\vc100\Release\dll/TestResultCollector.obj
+  .\vc100\Release\dll/TextOutputter.obj
+  .\vc100\Release\dll/XmlOutputter.obj
+  .\vc100\Release\dll/XmlOutputterHook.obj
+  .\vc100\Release\dll/TextTestRunner.obj
+  .\vc100\Release\dll/BriefTestProgressListener.obj
+  .\vc100\Release\dll/TestSuccessListener.obj
+  .\vc100\Release\dll/TextTestProgressListener.obj
+  .\vc100\Release\dll/TextTestResult.obj
+  .\vc100\Release\dll/BeosDynamicLibraryManager.obj
+  .\vc100\Release\dll/DynamicLibraryManager.obj
+  .\vc100\Release\dll/DynamicLibraryManagerException.obj
+  .\vc100\Release\dll/PlugInManager.obj
+  .\vc100\Release\dll/PlugInParameters.obj
+  .\vc100\Release\dll/TestPlugInDefaultImpl.obj
+  .\vc100\Release\dll/UnixDynamicLibraryManager.obj
+  .\vc100\Release\dll/Win32DynamicLibraryManager.obj
+  .\vc100\Release\dll/StringTools.obj
+  .\vc100\Release\dll/XmlDocument.obj
+  .\vc100\Release\dll/XmlElement.obj
+  .\vc100\Release\dll/DefaultProtector.obj
+  .\vc100\Release\dll/Protector.obj
+  .\vc100\Release\dll/ProtectorChain.obj
+     Creating library .\vc100\Release\dll/cppunit_dll.lib and object .\vc100\Release\dll/cppunit_dll.exp
+Manifest:
+  C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:".\vc100\Release\dll\cppunit_dll.dll.embed.manifest" /manifest .\vc100\Release\dll\cppunit_dll.dll.intermediate.manifest
+  C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo".\vc100\Release\dll\cppunit_dll.dll.embed.manifest.res" .\vc100\Release\dll\cppunit_dll_manifest.rc 
+LinkEmbedManifest:
+  C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\vc100\Release\dll\cppunit_dll.dll" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:".\vc100\Release\dll\cppunit_dll.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Work\cppunit-1.12.1\src\cppunit\vc100\Release\dll\cppunit_dll.pdb" /ASSEMBLYDEBUG /TLBID:1 /DYNAMICBASE:NO /IMPLIB:".\vc100\Release\dll/cppunit_dll.lib" /MACHINE:X86 /DLL .\vc100\Release\dll\cppunit_dll.dll.embed.manifest.res
+  .\vc100\Release\dll/DllMain.obj
+  .\vc100\Release\dll/RepeatedTest.obj
+  .\vc100\Release\dll/TestCaseDecorator.obj
+  .\vc100\Release\dll/TestDecorator.obj
+  .\vc100\Release\dll/TestSetUp.obj
+  .\vc100\Release\dll/TestFactoryRegistry.obj
+  .\vc100\Release\dll/TestNamer.obj
+  .\vc100\Release\dll/TestSuiteBuilderContext.obj
+  .\vc100\Release\dll/TypeInfoHelper.obj
+  .\vc100\Release\dll/AdditionalMessage.obj
+  .\vc100\Release\dll/Asserter.obj
+  .\vc100\Release\dll/Exception.obj
+  .\vc100\Release\dll/Message.obj
+  .\vc100\Release\dll/SourceLine.obj
+  .\vc100\Release\dll/SynchronizedObject.obj
+  .\vc100\Release\dll/Test.obj
+  .\vc100\Release\dll/TestAssert.obj
+  .\vc100\Release\dll/TestCase.obj
+  .\vc100\Release\dll/TestComposite.obj
+  .\vc100\Release\dll/TestFailure.obj
+  .\vc100\Release\dll/TestLeaf.obj
+  .\vc100\Release\dll/TestPath.obj
+  .\vc100\Release\dll/TestResult.obj
+  .\vc100\Release\dll/TestRunner.obj
+  .\vc100\Release\dll/TestSuite.obj
+  .\vc100\Release\dll/CompilerOutputter.obj
+  .\vc100\Release\dll/TestResultCollector.obj
+  .\vc100\Release\dll/TextOutputter.obj
+  .\vc100\Release\dll/XmlOutputter.obj
+  .\vc100\Release\dll/XmlOutputterHook.obj
+  .\vc100\Release\dll/TextTestRunner.obj
+  .\vc100\Release\dll/BriefTestProgressListener.obj
+  .\vc100\Release\dll/TestSuccessListener.obj
+  .\vc100\Release\dll/TextTestProgressListener.obj
+  .\vc100\Release\dll/TextTestResult.obj
+  .\vc100\Release\dll/BeosDynamicLibraryManager.obj
+  .\vc100\Release\dll/DynamicLibraryManager.obj
+  .\vc100\Release\dll/DynamicLibraryManagerException.obj
+  .\vc100\Release\dll/PlugInManager.obj
+  .\vc100\Release\dll/PlugInParameters.obj
+  .\vc100\Release\dll/TestPlugInDefaultImpl.obj
+  .\vc100\Release\dll/UnixDynamicLibraryManager.obj
+  .\vc100\Release\dll/Win32DynamicLibraryManager.obj
+  .\vc100\Release\dll/StringTools.obj
+  .\vc100\Release\dll/XmlDocument.obj
+  .\vc100\Release\dll/XmlElement.obj
+  .\vc100\Release\dll/DefaultProtector.obj
+  .\vc100\Release\dll/Protector.obj
+  .\vc100\Release\dll/ProtectorChain.obj
+     Creating library .\vc100\Release\dll/cppunit_dll.lib and object .\vc100\Release\dll/cppunit_dll.exp
+  cppunit_dll_vc100.vcxproj -> C:\Work\cppunit-1.12.1\src\cppunit\.\vc100\Release\dll\cppunit_dll.dll
+PostBuildEvent:
+  Description: Copying target to lib/
+  copy "C:\Work\cppunit-1.12.1\src\cppunit\.\vc100\Release\dll\cppunit_dll.dll" ..\..\lib\vc100\cppunit_dll.dll
+  copy "C:\Work\cppunit-1.12.1\src\cppunit\vc100\Release\dll\cppunit_dll.lib" ..\..\lib\vc100\cppunit_dll.lib
+  
+  :VCEnd
+          1 file(s) copied.
+          1 file(s) copied.
+FinalizeBuildStatus:
+  Deleting file ".\vc100\Release\dll\cppunit_dll.unsuccessfulbuild".
+  Touching ".\vc100\Release\dll\cppunit_dll.lastbuildstate".
+Done Building Project "C:\Work\cppunit-1.12.1\src\cppunit\cppunit_dll_vc100.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:17.97

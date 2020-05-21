@@ -1,0 +1,407 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DllSpecific">
+      <UniqueIdentifier>{4820c6b6-1e16-492b-97e8-816775e96b87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extension">
+      <UniqueIdentifier>{ab86a552-112c-423a-aec4-afb76b0936b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="helper">
+      <UniqueIdentifier>{51d5669e-6ee5-45f7-8356-8e5471a8dce8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{3f7dde07-157a-4864-9d09-5ee9482e116c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="output">
+      <UniqueIdentifier>{1afc4aeb-94a4-4995-8e16-f1ceb3f62431}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="portability">
+      <UniqueIdentifier>{ec84de15-b594-410f-a6ab-206e7167fffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="textui">
+      <UniqueIdentifier>{db66a744-7626-4427-87ac-86bb09275c29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="listener">
+      <UniqueIdentifier>{29e54637-796f-49fc-9a11-3ae9cc50a44a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugin">
+      <UniqueIdentifier>{e3cbc9f5-5013-4202-bbbb-003b245fa784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{d4fa4940-a979-4026-b4a5-e2e3235ecc84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="protector">
+      <UniqueIdentifier>{d822e045-56a1-4ea6-b9d3-f2e6f7a48482}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DllMain.cpp">
+      <Filter>DllSpecific</Filter>
+    </ClCompile>
+    <ClCompile Include="RepeatedTest.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="TestCaseDecorator.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="TestDecorator.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSetUp.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="TestFactoryRegistry.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="TestNamer.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSuiteBuilderContext.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeInfoHelper.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="AdditionalMessage.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="Asserter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="Exception.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="Message.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceLine.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="SynchronizedObject.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestAssert.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestCase.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestComposite.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestFailure.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestLeaf.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPath.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestResult.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestRunner.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSuite.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="CompilerOutputter.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="TestResultCollector.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="TextOutputter.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="XmlOutputter.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="XmlOutputterHook.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="TextTestRunner.cpp">
+      <Filter>textui</Filter>
+    </ClCompile>
+    <ClCompile Include="BriefTestProgressListener.cpp">
+      <Filter>listener</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSuccessListener.cpp">
+      <Filter>listener</Filter>
+    </ClCompile>
+    <ClCompile Include="TextTestProgressListener.cpp">
+      <Filter>listener</Filter>
+    </ClCompile>
+    <ClCompile Include="TextTestResult.cpp">
+      <Filter>listener</Filter>
+    </ClCompile>
+    <ClCompile Include="BeosDynamicLibraryManager.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicLibraryManager.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicLibraryManagerException.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="PlugInManager.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="PlugInParameters.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPlugInDefaultImpl.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="UnixDynamicLibraryManager.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32DynamicLibraryManager.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="StringTools.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="XmlDocument.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="XmlElement.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultProtector.cpp">
+      <Filter>protector</Filter>
+    </ClCompile>
+    <ClCompile Include="Protector.cpp">
+      <Filter>protector</Filter>
+    </ClCompile>
+    <ClCompile Include="ProtectorChain.cpp">
+      <Filter>protector</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\cppunit\extensions\ExceptionTestCaseDecorator.h">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\Orthodox.h">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\RepeatedTest.h">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestCaseDecorator.h">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestDecorator.h">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestSetUp.h">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\AutoRegisterSuite.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\HelperMacros.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestCaller.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestFactory.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestFactoryRegistry.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestFixtureFactory.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestNamer.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestSuiteBuilderContext.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TestSuiteFactory.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\extensions\TypeInfoHelper.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\AdditionalMessage.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\Asserter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\Exception.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\Message.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\SourceLine.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\SynchronizedObject.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\Test.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestAssert.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestCase.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestComposite.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestFailure.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestFixture.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestLeaf.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestListener.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestPath.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestResult.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestRunner.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestSuite.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\CompilerOutputter.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\Outputter.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TestResultCollector.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TextOutputter.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\XmlOutputter.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\XmlOutputterHook.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\config\config-bcb5.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\config\config-mac.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\config\config-msvc6.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\config\CppUnitApi.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\portability\CppUnitDeque.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\portability\CppUnitMap.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\portability\CppUnitSet.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\portability\CppUnitStack.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\portability\CppUnitVector.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\Portability.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\config\SelectDllLoader.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\config\SourcePrefix.h">
+      <Filter>portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\ui\text\TestRunner.h">
+      <Filter>textui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\ui\text\TextTestRunner.h">
+      <Filter>textui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TextTestRunner.h">
+      <Filter>textui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\BriefTestProgressListener.h">
+      <Filter>listener</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TextTestProgressListener.h">
+      <Filter>listener</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\TextTestResult.h">
+      <Filter>listener</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\plugin\DynamicLibraryManager.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\plugin\DynamicLibraryManagerException.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\plugin\PlugInManager.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\plugin\PlugInParameters.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\plugin\TestPlugIn.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\plugin\TestPlugInDefaultImpl.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\tools\StringTools.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\tools\XmlDocument.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\tools\XmlElement.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultProtector.h">
+      <Filter>protector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cppunit\Protector.h">
+      <Filter>protector</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtectorChain.h">
+      <Filter>protector</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtectorContext.h">
+      <Filter>protector</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\INSTALL-WIN32.txt" />
+    <None Include="Makefile.am" />
+    <None Include="..\..\include\cppunit\Makefile.am" />
+  </ItemGroup>
+</Project>
