@@ -1,0 +1,8 @@
+#Description:
+This module contains classes which are used for logging purposes. This library is based on log4cplus.
+
+#Link:
+https://github.com/malaterre/dcmtk/tree/master/oflog
+
+#Documentation
+https://support.dcmtk.org/docs/mod_oflog.html

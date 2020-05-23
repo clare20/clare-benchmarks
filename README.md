@@ -3,5 +3,4 @@ We used 5 DLLs from 4 open-source projects, and for every benchmark, there is a 
  - DLL
  - Ground truth
  - Source code
- - How to compile
  - README: Project description
