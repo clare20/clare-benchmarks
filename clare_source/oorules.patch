@@ -1,0 +1,958 @@
+diff --git a/share/prolog/oorules/final.P b/share/prolog/oorules/final.P
+index 68ebb23..f7a1931 100644
+--- a/share/prolog/oorules/final.P
++++ b/share/prolog/oorules/final.P
+@@ -87,6 +87,7 @@ classIdentifier(Method, ID) :-
+ % A helper for identifying "worthless" classes to reduce noise in the output.
+ :- table worthlessClass/1 as incremental.
+ 
++
+ % We want to reject classes with no useful information.  In practice this means having a single
+ % method, and no other "useful" data like a real destructor, a vftable, etc.  Sadly the final
+ % class rule is pretty complicated, this rule is largely a copy of that rule.  Maybe in the
+@@ -242,6 +243,19 @@ certainMemberAccessEvidence(Class, Offset, Size, Insn) :-
+     factMethod(Method),
+     validMethodMemberAccess(Insn, Method, Offset, Size).
+ 
++% --------------------------------------------------------------------------------------------
++:- table certainMemberWriteEvidence/4 as incremental.
++
++% Added for DPFinder
++certainMemberWriteEvidence(Class, Offset, Size, Insn) :-
++    %debug('Called certain Member Write:'),
++    validMethodMemberWrite(Insn, Method, Offset, Size),
++    find(Method, _),
++    factMethod(Method),
++    %debug('calling MemberAccessEvidence:'),
++    certainMemberAccessEvidence(Class, Offset, Size, Insn).
++    %debug('certain Member Write, passed::').
++
+ % --------------------------------------------------------------------------------------------
+ :- table finalMemberAccess/4 as incremental.
+ 
+@@ -260,6 +274,510 @@ finalMemberAccess(ClassID, Offset, Size, EvidenceList) :-
+     setof(I, certainMemberAccessEvidence(Class, Offset, Size, I), UnsortedEvidenceList),
+     sort(UnsortedEvidenceList, EvidenceList).
+ 
++% --------------------------------------------------------------------------------------------
++:- table finalMemberWrite/4 as incremental.
++
++% Added for DPFinder
++finalMemberWrite(ClassID, Offset, Size, Insn) :-
++    %debug('Calling MethodMemberWrite:'),
++    methodMemberWrite(Insn, _, _, _, _, _),
++    %debug('Calling finalMemberAccess:'), debugln(Insn),
++    certainMemberAccessEvidence(Class, Offset, Size, Insn),
++    certainMemberOnClass(Class, Offset, Size),
++    classIdentifier(Class, ClassID).
++    %debug('final Member Write, passed::').
++
++% Added for DPFinder
++:- table finalMemberWrite/4 as incremental.
++finalMemberWriteF(FunID, Offset, Size, Insn) :-
++    methodMemberWrite(Insn, FunID, _, _, _, _),
++    (certainMemberAccessEvidence(Class, Offset, Size, Insn) 
++    -> certainMemberOnClass(Class, Offset, Size)).
++
++:- table thisPtrAlternative/2 as incremental.
++thisPtrAlternative(ThisPtr, ThisPtr1):-
++    thisPtrAlternative(ThisPtr1, ThisPtr).
++
++thisPtrAlternative(ThisPtr, ThisPtr1):-
++    (thisPtrEquivalence(ThisPtr,ThisPtr1);
++	    thisPtrEquivalence(ThisPtr1, ThisPtr)) ->
++    iso_dif(ThisPtr, ThisPtr1).
++
++thisPtrAlternative(ThisPtr, ThisPtr1):-
++	possibleAssociationPtr(_, _, _, ThisPtr, ThisPtr1) ->
++    iso_dif(ThisPtr,ThisPtr1).
++
++:- import term_to_atom/2 from string.
++thisPtrAlternative_1(ThisPtr, ThisPtr1):-
++	funcParameter(MethId,Param,ThisPtr),
++  Param_new = Param,
++	possibleAssociationPtr(_, Param_new, MethId, ThisPtr2, ThisPtr3),
++	(ThisPtr1=ThisPtr2;ThisPtr1=ThisPtr3),
++	iso_dif(ThisPtr, ThisPtr1).
++
++:- table eventualThisPtr/2 as incremental.
++eventualThisPtr(Init,Result):-
++    thisPtrAlternative(Init, ThisPtr1) -> (Result=ThisPtr1,iso_dif(Init,Result)) ; (thisPtrAlternative_1(Init,Result)); Result=Init.
++
++:- table finalEmbeddedObjectPtr/3 as incremental.
++finalEmbeddedObjectPtr(OuterClass, Offset, EmbeddedClass) :-
++    %debug('Called finalEmbeddedObjectPtr'),
++    thisPtrAllocation(_, _, ThisPtr, type_Heap, _),
++    %debugln('got this Ptr:'), debugln(ThisPtr),
++    methodMemberWrite(Insn, MethId, Offset, _, _, SvList),
++    %debugln('checking methodMemberWrite on instruction: '), debugln(Insn),
++    eventualThisPtr(ThisPtr,ThisPtr1),
++    (member(ThisPtr1,SvList); member(ThisPtr,SvList)),
++    %debug('Eventual ThisPtr '), debugln(ThisPtr),
++    (thisPtrUsage(_, _ , ThisPtr1, FinalMeth1); thisPtrUsage(_, _, ThisPtr, FinalMeth1)),
++    dethunk(FinalMeth1,FinalMeth),
++    % debug('Got final method '), debugln(FinalMeth),
++    find(FinalMeth, EmbeddedClass1),
++    classIdentifier(EmbeddedClass1, EmbeddedClass),
++    % debug('Got embedded class: '), debugln(EmbeddedClass),
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    % debug('Got outer class: '), debugln(OuterClass),
++    iso_dif(OuterClass, EmbeddedClass).
++    %debug('finalEmbPtr passed!').
++
++:- table finalEmbeddedObjectPtr_B/3 as incremental.
++finalEmbeddedObjectPtr_B(OuterClass, Offset, EmbeddedClass) :-
++    %debug('Called finalEmbeddedObjectPtr'),
++    thisPtrAllocation(_, MethId, ThisPtr, type_Heap, _),
++    %debugln('got this Ptr:'), debugln(ThisPtr),
++    %methodMemberWrite(Insn, MethId, Offset, _, _, SvList),
++    %debugln('checking methodMemberWrite on instruction: '), debugln(Insn),
++    eventualThisPtr(ThisPtr,ThisPtr1),
++    %(member(ThisPtr1,SvList); member(ThisPtr,SvList)),
++    % debug('Eventual ThisPtrs '), debugln(ThisPtr), debugln(ThisPtr1),
++    ( (callParameter(Ins1, MethId, Offset, ThisPtr), callTarget(Ins1, MethId, TarFun), dethunk(TarFun, TarFun1), finalAggregation(_,TarFun1, Offset, _, _));
++    (callParameter(Ins1, MethId, Offset, ThisPtr1), callTarget(Ins1, MethId, TarFun), dethunk(TarFun, TarFun1), finalAggregation(_,TarFun1, Offset, _, _))
++    ),
++    (thisPtrUsage(_, _ , ThisPtr1, FinalMeth1); thisPtrUsage(_, _, ThisPtr, FinalMeth1)),
++    dethunk(FinalMeth1,FinalMeth),
++    % debug('Got final method '), debugln(FinalMeth),
++    find(FinalMeth, EmbeddedClass1),
++    classIdentifier(EmbeddedClass1, EmbeddedClass),
++    % debug('Got embedded class: '), debugln(EmbeddedClass),
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    % debug('Got outer class: '), debugln(OuterClass),
++    iso_dif(OuterClass, EmbeddedClass).
++    %debug('finalEmbPtr_B passed!').
++
++finalComposition(OuterClass, Offset, EmbeddedClass):-
++  %finalEmbeddedObjectPtr(OuterClass, Offset, EmbeddedClass).
++    or([
++         finalEmbeddedObjectPtr(OuterClass, Offset, EmbeddedClass),
++         finalEmbeddedObjectPtr_B(OuterClass, Offset, EmbeddedClass)
++       ]),(finalClass(EmbeddedClass, _, _, _, _, _),finalClass(OuterClass, _, _, _, _, _)).
++
++
++
++convertStrToInt(Param_loc1,Ans):-
++    not(Param_loc1 \= '1') -> Ans=1;
++    not(Param_loc1 \= '2') -> Ans=2;
++    not(Param_loc1 \= '3') -> Ans=3;
++    not(Param_loc1 \= '4') -> Ans=4;
++    not(Param_loc1 \= '5') -> Ans=5;
++    not(Param_loc1 \= '6') -> Ans=6;
++    not(Param_loc1 \= '7') -> Ans=7;
++    not(Param_loc1 \= '8') -> Ans=8;
++    not(Param_loc1 \= '9') -> Ans=9;
++    not(Param_loc1 \= '10') -> Ans=10;
++    not(Param_loc1 \= '11') -> Ans=11;
++    not(Param_loc1 \= '12') -> Ans=12;
++    not(Param_loc1 \= '13') -> Ans=13.
++
++checkAndConvert(Param_loc, FParam_loc):- 
++    Li = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
++    member(Param_loc, Li) -> convertStrToInt(Param_loc, FParam_loc) ; FParam_loc = Param_loc.
++
++:- table finalAssociation/5 as incremental.
++finalAssociation(OuterClass, MethId, FParam_loc, EmbeddedClass, Cert):-
++    Cert is 1,
++    or([
++           finalAssociation_int(OuterClass, MethId, Param_loc, EmbeddedClass, _)
++           % finalAssociation_ext(OuterClass, MethId, Param_loc, EmbeddedClass, _)
++       ]),(finalClass(EmbeddedClass, _, _, _, _, _),finalClass(OuterClass, _, _, _, _, _)),
++    checkAndConvert(Param_loc, FParam_loc).
++
++
++
++:- table finalAssociation_ext/5 as incremental.
++finalAssociation_ext(OuterClass, MethId, Param_loc, EmbeddedClass, Cert):-
++    Cert is 1,
++    or([
++           % finalAssociation_ext_A(OuterClass, MethId, Param_loc, EmbeddedClass, _),
++           finalAssociation_ext_B(OuterClass, MethId, Param_loc, EmbeddedClass, _)
++       ]),(finalClass(EmbeddedClass, _, _, _, _, _),finalClass(OuterClass, _, _, _, _, _)).
++
++% For forward analysis
++:- table finalAssociation_ext_A/5 as incremental.
++finalAssociation_ext_A(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    funcParameter(MethId, Param_loc_2,ThisPtr),
++    iso_dif(Param_loc_2, ecx),
++    callParameter(Insn, MethId, Param_loc1, ThisPtr),
++    callTarget(Insn, MethId, TargetFunThunk),
++    dethunk(TargetFunThunk, FinalFun),
++    finalAssIntFact(_, FinalFun, _, EmbeddedClass1, _),
++    Param_loc = Param_loc_2,
++    EmbeddedClass = EmbeddedClass1,
++    Certainity = 1.
++
++:- table finalAssociation_ext_B/5 as incremental.
++finalAssociation_ext_B(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    funcParameter(MethId, Param_loc_2,_),
++    iso_dif(Param_loc_2, ecx),
++    %debugln('checking for meth: '), debugln(MethId),
++    thisPtrUsage(Insn, _, _, MethId),
++    callParameter(Insn, TempMeth, Param_loc1, ThisPtr),
++    iso_dif(Param_loc1, ecx),
++    funcParameter(TempMeth, Loc, ThisPtr),
++    finalAssIntFact(_, TempMeth, Loc, EmbeddedClass1, _),
++    Param_loc = Param_loc1,
++    EmbeddedClass = EmbeddedClass1,
++    %debugln("Passed with Emb_clas: "), debugln(EmbeddedClass),
++    Certainity = 1.
++
++exportFinalAss(Status, MethId, EmbeddedClass):-
++    finalAssociation_int(OuterClass, MethId, Param_loc, EmbeddedClass, Cert),
++    checkAndConvert(Param_loc, FParam_loc),
++    incr_asserta(finalAssIntFact(OuterClass, MethId, FParam_loc, EmbeddedClass, Cert)),
++    Status = 1.
++
++
++:- table finalAssociation_int/5 as incremental.
++finalAssociation_int(OuterClass, MethId, Param_loc, EmbeddedClass, Cert):-
++    Cert is 1,
++    or([
++	       finalAssociation_G(OuterClass, MethId, Param_loc, EmbeddedClass, _),
++	       finalAssociation_F(OuterClass, MethId, Param_loc, EmbeddedClass, _),
++           finalAssociation_A(OuterClass, MethId, Param_loc, EmbeddedClass, _),
++           finalAssociation_B(OuterClass, MethId, Param_loc, EmbeddedClass, _),
++	       finalAssociation_D(OuterClass, MethId, Param_loc, EmbeddedClass, _),
++           finalAssociation_E(OuterClass, MethId, Param_loc, EmbeddedClass, _),
++	       finalAssociation_C(OuterClass, MethId, Param_loc, EmbeddedClass, _)
++       ]),(finalClass(EmbeddedClass, _, _, _, _, _),finalClass(OuterClass, _, _, _, _, _)).
++
++
++:- table finalAssociation_H/5 as incremental.
++finalAssociation_H(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    funcParameter(MethId, Param_loc_2,_),
++    iso_dif(Param_loc_2, ecx),
++    debugln('checking for meth: '), debugln(MethId),
++    thisPtrUsage(Insn, _, _, MethId),
++    callParameter(Insn, TempMeth, Param_loc1, ThisPtr),
++    iso_dif(Param_loc1, ecx),
++    thisCallMethod(TempMeth, ThisPtr, _),
++    Param_loc = Param_loc1,
++    find(TempMeth, EmbeddedClass1),
++    classIdentifier(EmbeddedClass1, EmbeddedClass),
++    % debugln("Passed with Emb_clas: "), debugln(EmbeddedClass),
++    Certainity = 1.
++
++
++:- table finalAssociation_G/5 as incremental.
++finalAssociation_G(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    %debugln('in finalAss_G'),
++    !, find(MethId, OuterClass1),
++    factConstructor(MethId),
++    funcParameter(MethId, Param_loc1,ThisPtr),
++    Param_loc1 \= ecx,
++    %debugln('Testing for method: '), debugln(MethId),
++    callTarget(TempLoc1, TempMeth1, MethId),
++    callParameter(TempLoc1, TempMeth1, Param_loc1, TempThis1),
++    funcParameter(TempMeth1, TempParam1,TempThis1),
++    %debugln('Got method: '), debugln(TempMeth1),
++    callTarget(TempLoc2, TempMeth2, TempMeth1),
++    callParameter(TempLoc2, TempMeth2, TempParam1, TempThis2),
++    funcParameter(TempMeth2, TempParam2,TempThis2),
++    %debugln('Got method: '), debugln(TempMeth2),
++    callTarget(TempLoc3, TempMeth3, TempMeth2),
++    callParameter(TempLoc3, TempMeth3, TempParam2, TempThis3),
++    (
++      ( funcParameter(TempMeth3, TempParam3,TempThis3),
++      %debugln('Got method: '), debugln(TempMeth3),
++      callTarget(TempLoc4, TempMeth4, TempMeth3),
++      callParameter(TempLoc4, TempMeth4, TempParam3, TempThis4),
++      (
++        ( not(funcParameter(TempMeth4,_,TempThis4)),
++          possibleAssociationPtr(_,_,_, TempThis4, TempThis5),
++          thisPtrUsage(_, _, TempThis5, FinalMeth)) ;
++        (
++          funcParameter(TempMeth4,TempParam4,TempThis4),
++          %debugln('Got method4: '), debugln(TempMeth4),
++          callTarget(TempLoc5, TempMeth5, TempMeth4),
++          callParameter(TempLoc5, TempMeth5, TempParam4, TempThis5),
++          %debugln('Got method5: '), debugln(TempMeth5),
++          not(funcParameter(TempMeth5,_,TempThis5)),
++          possibleAssociationPtr(_,_,_, TempThis5, TempThis6),
++          thisPtrUsage(_, _, TempThis6, FinalMeth)
++        )
++      )
++    ) ; (
++        not(funcParameter(TempMeth3, TempParam3,TempThis3)),
++        possibleAssociationPtr(_,_,_, TempThis3, TempThis7),
++        thisPtrUsage(_, _, TempThis7, FinalMeth)
++        %debugln('got finalMeth:'), debugln(FinalMeth)
++    )),
++    find(FinalMeth, EmbeddedClass1),
++    classIdentifier(EmbeddedClass1, EmbeddedClass),
++    classIdentifier(OuterClass1, OuterClass),
++    %iso_dif(OuterClass1, EmbeddedClass1),
++    Param_loc = Param_loc1,
++    %debug('got finalAss_G passed'),
++    Certainity=1.
++
++
++
++:- table finalAssociation_C/5 as incremental.
++finalAssociation_C(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    %debugln('in finalAss_C'),
++    possibleAssociationValue(Alloc_Ins_Addr, MethId1, ThisPtr, Alloc_loc, Alloc_size),
++    dethunk(MethId1,MethId),
++    factMethod(MethId),
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    thisPtrUsage(_, _, ThisPtr, Method1),
++    dethunk(Method1,Method),
++    factMethod(Method),
++    find(Method, EmbeddedClass1),
++    classIdentifier(EmbeddedClass1, EmbeddedClass),
++    %iso_dif(OuterClass, EmbeddedClass),
++    Param_loc='-1',
++    %debug('finalAss_C : '), debugln(MethId), debugln(EmbeddedClass),
++    Certainity=1.
++
++:- table finalAssociation_F/5 as incremental.
++finalAssociation_F(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    %debugln('in finalAss_F'),
++    exportedAssociation(MethId1, Param_loc, MethId2),
++    %debugln('finalAss_F'), debugln(MethId1),
++    dethunk(MethId1,MethId),
++    %debugln(MethId),
++    reasonMethod(MethId),
++    factMethod(MethId),
++    find(MethId, OuterClass1),
++    %debug('Got outer class: '), debugln(OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    dethunk(MethId2,Method),
++    reasonMethod(Method),
++    %debugln(Method),
++    find(Method, EmbeddedClass1),
++    classIdentifier(EmbeddedClass1, EmbeddedClass),
++    %iso_dif(OuterClass, EmbeddedClass),
++    %debug('finalAss_F : '), debugln(MethId), debugln(EmbeddedClass),
++    Certainity=1.
++
++:- table finalAssociation_A/4 as incremental.
++finalAssociation_A(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    %debugln('in finalAss_A'),
++    possibleAssociationPtr(Call_Addr, Alloc_loc, MethId1, ThisPtr, ThisPtr1),
++    dethunk(MethId1,MethId),
++    factMethod(MethId),
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    ((thisPtrUsage(_, _, ThisPtr, Method1), thisCallMethod(Method1, ThisPtr, _Certainty)); (thisPtrUsage(_, _, ThisPtr1, Method1), thisCallMethod(Method1, ThisPtr1, _Certainty))),
++    dethunk(Method1, Method),
++    factMethod(Method),
++    find(Method, EmbeddedClass1), classIdentifier(EmbeddedClass1, EmbeddedClass),
++    %iso_dif(OuterClass, EmbeddedClass),
++    Param_loc=Alloc_loc,
++    %debug('finalAss_A : '), debugln(MethId), debugln(EmbeddedClass),
++    Certainity=1.
++
++:- table finalAssociation_B/5 as incremental.
++finalAssociation_B(OuterClass, MethId, Param_loc, EmbeddedClass, _Certainity):-
++    %debugln('in finalAss_B'),
++    possibleAssociationPtr(Call_Addr, Alloc_loc, MethId1, ThisPtr, ThisPtr1),
++    (not(thisPtrUsage(_,_, ThisPtr,_)) -> (_Certainity=0);_Certainity=1 ),
++    dethunk(MethId1,MethId),
++    factMethod(MethId),
++
++    (find(MethId, OuterClass1) ->  classIdentifier(OuterClass1, OuterClass) ),
++    eventualThisPtr(ThisPtr1, ThisPtr2),
++    eventualThisPtr(ThisPtr, ThisPtr3),
++    (thisPtrUsage(_, _, ThisPtr1, Method3); thisPtrUsage(_, _, ThisPtr, Method3); thisPtrUsage(_, _, ThisPtr2, Method3); thisPtrUsage(_,_,ThisPtr3, Method3); thisCallMethod(Method3,ThisPtr,_); thisCallMethod(Method3,ThisPtr1,_); thisCallMethod(Method3,ThisPtr2,_); thisCallMethod(Method3,ThisPtr3,_)),
++    dethunk(Method3,Method),
++    factMethod(Method),
++    find(Method, EmbeddedClass1), classIdentifier(EmbeddedClass1, EmbeddedClass),
++    %iso_dif(OuterClass, EmbeddedClass),
++    %debug('finalAss_B : '), debugln(MethId), debugln(EmbeddedClass),
++    Param_loc=Alloc_loc.
++
++
++:- import term_to_atom/2 from string.
++:- table finalAssociation_D/5 as incremental.
++finalAssociation_D(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    %debugln('in finalAss_D'),
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    funcParameter(MethId, Param_loc1,ThisPtr),
++    iso_dif(Param_loc1, ecx),
++    Param_loc = Param_loc1,
++    eventualThisPtr(ThisPtr, ThisPtr1),
++    (
++    ( callTarget(T_loc1, T_meth1, MethId), callParameter(T_loc1, T_meth1, Param_loc1, T_ThisPtr) ,(thisCallMethod(_,T_ThisPtr,TempTMeth); funcParameter(TempTMeth, ecx, T_ThisPtr)), dethunk(TempTMeth, FinalFun));
++    ((callParameter(Ins,_,ecx,ThisPtr);callParameter(Ins,_,ecx,ThisPtr1)), callTarget(Ins,_,TempFun), dethunk(TempFun,FinalFun));
++    ((thisPtrUsage(_, _, ThisPtr, Method1);thisPtrUsage(_, _, ThisPtr1, Method1)),dethunk(Method1,FinalFun));
++    (( callParameter(Ins,MethId,Temp_Param,ThisPtr);callParameter(Ins,MethId,Temp_Param,ThisPtr1) ),Temp_Param \= ecx,callTarget(Ins,MethId,Loc),funcParameter(Loc,Temp_Param,New_thisPtr),eventualThisPtr(New_thisPtr, FinalThisPtr),( (thisPtrUsage(_,_,FinalThisPtr,TempMeth);thisPtrUsage(_,_,New_thisPtr,TempMeth)) ),dethunk(TempMeth,FinalFun))
++    ),
++    find(FinalFun,TempEmbb),
++    classIdentifier(TempEmbb,EmbeddedClass),
++    %iso_dif(OuterClass,EmbeddedClass),
++    (
++    (findallMethods(TempEmbb, UnsortedMethodL),
++    length(UnsortedMethodL, LL),
++    LL > 1) ; (factConstructor(MethId))
++    ),
++    %debug('Concluded by finalAss_D: '), debugln(MethId), debugln(EmbeddedClass),
++    Certainity=1.
++
++:- table finalAssociation_E/5 as incremental.
++finalAssociation_E(OuterClass, MethId, Param_loc, EmbeddedClass, Certainity):-
++    %debugln('in finalAss_E'),
++    find(MethId, OuterClass1),
++    classIdentifier(OuterClass1, OuterClass),
++    funcParameter(MethId, Param_loc1,ThisPtr),
++    iso_dif(Param_loc1, ecx),
++    Param_loc = Param_loc1,
++    eventualThisPtr(ThisPtr, ThisPtr1),
++
++    (callParameter(Ins,MethId,Temp_Param,ThisPtr),callTarget(Ins,MethId,Loc),
++    funcParameter(Loc,Temp_Param,New_thisPtr),eventualThisPtr(New_thisPtr, FinalThisPtr),
++    (
++    (thisPtrUsage(_,_,FinalThisPtr,TempMeth);thisPtrUsage(_,_,New_thisPtr,TempMeth)))
++    ),
++    iso_dif(TempMeth,1) -> (
++    dethunk(TempMeth,FinalFun),
++    find(FinalFun,TempEmbb),
++    classIdentifier(TempEmbb,EmbeddedClass),
++    %iso_dif(OuterClass,EmbeddedClass),
++    findallMethods(TempEmbb, UnsortedMethodL),
++    length(UnsortedMethodL, LL),
++    LL > 1,
++    % debug('Concluded by finalAss_Ea: '), debug(MethId), debugln(EmbeddedClass),
++    Certainity=1);
++    MethId \= 1 -> (EmbeddedClass=EmbCls,
++    % debug('Concluded by finalAss_Eb: '), debug(MethId), debugln(EmbeddedClass),
++    Certainity=1).
++
++:- import select/3 from basics.
++:- table finalAggregation/5 as incremental.
++finalAggregation(OuterClass, MethId, Param_loc, Member, EmbeddedClass):-
++    Cert is 1,
++    or([
++	       finalAggregation_A(OuterClass, MethId, Param_loc, Member, EmbeddedClass),
++	       finalAggregation_PB(OuterClass, MethId, Param_loc, Member, EmbeddedClass)
++       ]).
++
++
++:- table finalAggregation_A/5 as incremental.
++finalAggregation_A(OuterClass, MethId, Param_loc, Member, EmbeddedClass):-
++    finalAssociation(OuterClass, MethId, Param_loc1, EmbeddedClass,_), Param_loc1 \= '-1',
++    finalMemberWriteF(MethID, Member, _, Insn),
++    %debug('FinalAggregation: testing for '), debug(MethId), debugln(Param_loc1),
++    methodMemberWrite(Insn, MethId, _, _, _, SvList),
++    %debug('Checking member write '), debugln(OuterClass),
++    select(ThisPtr1,SvList,_),
++    %debug('Extracting this pointer from list '), debugln(ThisPtr1),
++    eventualThisPtr(ThisPtr1,ThisPtr),
++    %debug('Passed eventual this ptr'), debugln(ThisPtr),
++    %debug('Checking func param'),
++    %debugln(MethId), debugln(ThisPtr),
++    funcParameter(MethId, Param_loc2, ThisPtr), % Compare offset and Param_Loc1
++    %debug('FIXME: Checking Param2: '), debugln(Param_loc2),
++    %debug('Checking Param1: '), debugln(Param_loc1),
++    Ans = Param_loc1,
++    %debugln('after convert str to int : Got Ans'), debugln(Ans),
++    not(Ans \= Param_loc2), Param_loc=Ans.
++    %debugln('FinalAgg passed!').
++
++testValidity(MethId, CallMeth, OuterClass, Param_loc, Member, EmbeddedClassFinal):-
++    finalAggIntFact(OuterClass, CallMeth, Param_loc, Member, TempEmbeddedClass),
++    finalAssIntFact(_, CallMeth, _, TempEmbeddedClass1, _),
++    debug('TempEmbeddedClass1 before TOuterClass is: '), debugln(TempEmbeddedClass1),
++    debug('CallMeth is: '), debugln(CallMeth),
++    debug('TOuterClass '), debugln(OuterClass), !,
++    find(MethId, EmbeddedClass),
++    classIdentifier(EmbeddedClass, EmbeddedClassId),
++    debug('EmbeddedClassID is: '), debugln(EmbeddedClassId),
++    debug('TempEmbeddedClass is: '), debugln(TempEmbeddedClass),
++    debug('TempEmbeddedClass1 is: '), debugln(TempEmbeddedClass1),
++    not(EmbeddedClassId \= TempEmbeddedClass), !,
++    EmbeddedClassFinal = TempEmbeddedClass1 ->
++    debugln('Test validity passed!').
++
++:- table finalAggregation_PB/5 as incremental.
++finalAggregation_PB(OuterClass, MethId, Param_loc, Member, EmbeddedClassFinal):-
++    std_push_back_meth(TMethId),
++    debugln('in finalAggregation_PB'), debugln(TMethId),
++    thunk(TempMeth, TMethId),
++    debug('Got thunk: '), debugln(TempMeth),
++    callTarget(_, CallMeth, TempMeth),
++    debug('Got CallMeth: '), debugln(CallMeth),
++    testValidity(TMethId, CallMeth, OuterClass, Param_loc, Member, EmbeddedClassFinal),
++    debug('EmbeddedClassFinal is: '), debugln(EmbeddedClassFinal),
++    MethId = TMethId,
++    debugln('finalAggregation_PB passed').
++    
++exportFinalAgg(Status, MethId, EmbeddedClass):-
++    finalAggregation_int(OuterClass, MethId, Param_loc, Member, EmbeddedClass),
++    incr_asserta(finalAggIntFact(OuterClass, MethId, Param_loc, Member, EmbeddedClass)),
++    Status = 1.
++
++:- table finalAggregation_int/5 as incremental.
++finalAggregation_int(OuterClass, MethId, Param_loc, Member, EmbeddedClass):-
++    Cert is 1,
++    or([
++	       finalAggregation_T(OuterClass, MethId, Param_loc, Member, EmbeddedClass)
++       ]).
++
++:- table finalAggregation_T/5 as incremental.
++finalAggregation_T(OuterClass, MethId, Param_loc, Member, EmbeddedClass):-
++    finalAssociation(OuterClass, MethId, Param_loc1, _, _), Param_loc1 \= '-1',
++    methodMemberWrite(_, MethId, _, _, _, SvList),
++    %debug('Checking member write '), debugln(OuterClass),
++    select(ThisPtr1,SvList,_),
++    %debug('Extracting this pointer from list '), debugln(ThisPtr1),
++    eventualThisPtr(ThisPtr1,ThisPtr),
++    ((thisPtrUsage(_, _, ThisPtr, TempTMeth); funcParameter(TempTMeth, ecx, ThisPtr); (callParameter(InsTemp, _, ecx, ThisPtr), callTarget(InsTemp, _, TempTMeth)) ), dethunk(TempTMeth, FinalFun)),
++    find(FinalFun,TempEmbb),
++    classIdentifier(TempEmbb,EmbeddedClass),
++    Param_loc = Param_loc1,
++    Member = -1.
++
++:- table possibleAdapter/3 as incremental.
++possibleAdapter(Adapter, Adaptee, Client):-
++   %debugln('In pssible Adapter'),
++   finalInheritance(Adapter, Adaptee, _,_,_),
++   (finalInheritance(Adapter, Temp,_,_,_); finalAssociation(Adapter,_,_,Temp,1); finalComposition(Adapter,_,Temp)), Adaptee \= Temp, Temp=Client.
++   %(finalInheritance(Adapter, Temp,_,_,_); finalAssociation(Adapter, _, _,Temp,_ )),
++   %debugln(Adaptee), debugln(Temp),
++   %(iso_dif(Adaptee,Temp)) -> Client=Temp.
++ 
++:- table possibleDecorator/2 as incremental.
++possibleDecorator(Decorator, Base):-
++   % debugln('in possible decorator:'),
++   (finalAggregation(Pdec, _, _, _, Pbase); finalComposition(Pdec, _, Pbase)),
++   finalInheritance(Pdec, Pbase, _, _, _),
++ %  debugln(Pdec), debugln(Pbase),
++   finalInheritance(_ , Pdec, _,_,_),
++   finalInheritance(Temp, Pbase, _, _, _),
++   Temp \= Pdec,
++   Decorator = Pdec,
++   Base = Pbase,
++   debugln('Concluded possible Decorator').
++   
++
+ % --------------------------------------------------------------------------------------------
+ :- table finalMember/4 as incremental.
+ 
+@@ -291,34 +809,6 @@ finalMember(ClassID, Offset, Sizes, certain) :-
+ % In many cases, no qualifiers of any kind are required for specific methods.  However, there
+ % are multiple properties of a method that can all be determined at different confidence levels
+ % independently.
+-
+-
+-% This result marks that a method is certain to be a constructor.  The certain field is
+-% currently scheduled for elimination.
+-finalMethodProperty(Method, constructor, certain) :-
+-    factConstructor(Method),
+-    not(worthlessClass(Method)).
+-
+-% --------------------------------------------------------------------------------------------
+-% This result marks that a method is certain to be a deleting destructor.  The certain field is
+-% currently scheduled for elimination..  The single method that is a real destructor for any
+-% given class is determined from the finalClass result.
+-finalMethodProperty(Method, deletingDestructor, certain) :-
+-    factDeletingDestructor(Method),
+-    not(worthlessClass(Method)).
+-
+-% --------------------------------------------------------------------------------------------
+-% At one point I had though that this was duplicative, and therefore should not be included in
+-% the output.  After having been annoyed by it's absence repeatedly, we're going to at least
+-% try it with it on for a while.
+-finalMethodProperty(Method, realDestructor, certain) :-
+-    factRealDestructor(Method),
+-    not(worthlessClass(Method)).
+-
+-% --------------------------------------------------------------------------------------------
+-% This result marks whether a method is believed to be virtual, and what our confidence in that
+-% assertion is.  It's likely that this is exactly equivalent to whether the method appears in
+-% any virtual function table, and what the confidence in that offset of that virtual function
+ % table is.  This fact may be equally easy to compute from the finalVFTable results after
+ % importation back into C++.   In that case, this result may be eliminated.
+ 
+@@ -371,3 +861,4 @@ generateResults :-
+ /* fill-column:    95 */
+ /* comment-column: 0  */
+ /* End:               */
++
+diff --git a/share/prolog/oorules/guess.P b/share/prolog/oorules/guess.P
+old mode 100644
+new mode 100755
+index 91c6c85..ff96cdb
+--- a/share/prolog/oorules/guess.P
++++ b/share/prolog/oorules/guess.P
+@@ -15,6 +15,10 @@ tryBinarySearchInt(PosPred, NegPred, L) :-
+     %logtrace('tryBinarySearch on '), logtraceln(L),
+     !,
+     (call(PosPred, X);
++     logwhere('The guess '), logwhere(PosPred), logwhere('('), logwhere(X),
++     logwhereln(') was inconsistent with a valid solution.'),
++     logwhere('Guessing '), logwhere(NegPred), logwhere('('), logwhere(X),
++     logwhereln(') instead.'),
+      call(NegPred, X)).
+ 
+ tryBinarySearchInt(PosPred, NegPred, List) :-
+@@ -33,8 +37,9 @@ tryBinarySearchInt(PosPred, NegPred, List) :-
+ 
+     tryBinarySearchInt(PosPred, NegPred, NewList).
+ 
+-tryBinarySearchInt(_PP, _NP, _L) :-
+-    %logtrace('tryBinarySearch completely failed on '), logtrace(L), logtraceln(' and will now backtrack to fix an upstream problem.'),
++tryBinarySearchInt(_PP, _NP, L) :-
++    logtrace('tryBinarySearch completely failed on '), logtrace(L),
++    logtraceln(' and will now backtrack to fix an upstream problem.'),
+     fail.
+ 
+ % This is a wrapper that limits the number of entries to assert at one time
+@@ -97,10 +102,10 @@ guessVirtualFunctionCall(Insn, Constructor, OOffset, VFTable, VOffset) :-
+ 
+ guessVirtualFunctionCall :-
+     minof((Insn, Constructor, OOffset, VFTable, VOffset),
+-	  (likelyVirtualFunctionCall(Insn, Constructor, OOffset, VFTable, VOffset),
+-	   not(factNOTConstructor(Constructor)),
+-	   not(factVirtualFunctionCall(Insn, Constructor, OOffset, VFTable, VOffset)),
+-	   not(factNOTVirtualFunctionCall(Insn, Constructor, OOffset, VFTable, VOffset)))),
++          (likelyVirtualFunctionCall(Insn, Constructor, OOffset, VFTable, VOffset),
++           not(factNOTConstructor(Constructor)),
++           not(factVirtualFunctionCall(Insn, Constructor, OOffset, VFTable, VOffset)),
++           not(factNOTVirtualFunctionCall(Insn, Constructor, OOffset, VFTable, VOffset)))),
+ 
+     guessVirtualFunctionCall(Insn, Constructor, OOffset, VFTable, VOffset).
+ 
+@@ -187,33 +192,51 @@ tryNOTVBTable(VBTable) :-
+ % --------------------------------------------------------------------------------------------
+ % Try guessing that a virtual function table entry is valid.
+ % --------------------------------------------------------------------------------------------
++
+ prioritizedVFTableEntry(VFTable, Offset, Entry) :-
+     % First establish that the guess meets minimal requirements.
+     possibleVFTableEntry(VFTable, Offset, Entry),
+     factVFTable(VFTable),
++    % Then that it's not already proved or disproved.
++    not(factVFTableEntry(VFTable, Offset, Entry)),
++    not(factNOTVFTableEntry(VFTable, Offset, Entry)).
+ 
+-    % We should really be able to enforce known methods here, but sadly in the current test
+-    % suite we cannot, because a few tests rely on guessing the last member of the VFTable. :-(
+-    % Probably the next thing to try is exporting thisCall(Method) facts from OOAnalyzer, so
+-    % that we know which guesses are better than garbage.  In other words, guess factMethod()
+-    % first based on something other than the VFtableEntry.  In the meantime leave it out.
++% First priority guess, when we already know Entry is an OO method.
++guessVFTableEntry1(VFTable, Offset, Entry) :-
++    % Choose a prioritized VFTable entry to guess.
++    prioritizedVFTableEntry(VFTable, Offset, Entry),
+ 
+-    % (factMethod(Entry); purecall(Entry)),
++    % Prioritize guesses where we know that the method is actually an OO method first.  This
++    % means that we're not really guessing whether this is a valid entry, we're just guessing
++    % whether it's a valid entry in _this_ table.  This is a very safe guess.
++    (factMethod(Entry); purecall(Entry)),
+ 
+-    % Then that it's not already proved or disproved.
+-    not(factVFTableEntry(VFTable, Offset, Entry)),
+-    not(reasonNOTVFTableEntry(VFTable, Offset, Entry)).
++    % Prioritize guessing the largest likely offset first.  This clause leads to make fewer
++    % guesses that that imply all of the smaller offsets.  This turns out to be important from
++    % a performance perspective because it reduces the number of times we need to check the
++    % entire system against the valid solution constraints.
++    % ejs: TEMPORARY RULE.  If (V, O, E) is not an entry, then do not guess for any E' <
++    % E. Otherwise we'll keep trying E-4, E-8, and so on.
++    not((factNOTVFTableEntry(VFTable, Offset, OtherEntry), OtherEntry > Entry)),
++    not((prioritizedVFTableEntry(VFTable, LargerOffset, _OtherEntry), LargerOffset > Offset)).
+ 
+-% --------------------------------------------------------------------------------------------
+-guessVFTableEntry(VFTable, Offset, Entry) :-
++% Second priority guess, when we also have to guess that Entry is an OO method.
++guessVFTableEntry2(VFTable, Offset, Entry) :-
+     % Choose a prioritized VFTable entry to guess.
+     prioritizedVFTableEntry(VFTable, Offset, Entry),
++
++    % While using a weaker standard than the previous VFTableEntry guessing rule, this is also
++    % reasonably safe, because we're only guessing entries where there's a plausible case that
++    % the Entry is at least a function, and also probably a method.  This guess should be
++    % eliminated in favor of the previous rule if possible, but in at least one case in the
++    % test suite, we still need this rule because the last entry in the VFTable has no other
++    % references and so we miss it entirely without this rule.
++    possibleMethod(Entry),
++
+     % Prioritize guessing the largest likely offset first.  This clause leads to make fewer
+     % guesses that that imply all of the smaller offsets.  This turns out to be important from
+     % a performance perspective because it reduces the number of times we need to check the
+     % entire system against the valid solution constraints.
+-    not(factVFTableEntry(VFTable, Offset, Entry)),
+-    not(factNOTVFTableEntry(VFTable, Offset, Entry)),
+     % ejs: TEMPORARY RULE.  If (V, O, E) is not an entry, then do not guess for any E' <
+     % E. Otherwise we'll keep trying E-4, E-8, and so on.
+     not((factNOTVFTableEntry(VFTable, Offset, OtherEntry), OtherEntry > Entry)),
+@@ -221,7 +244,13 @@ guessVFTableEntry(VFTable, Offset, Entry) :-
+ 
+ guessVFTableEntry :-
+     osetof((VFTable, Offset, Entry),
+-          guessVFTableEntry(VFTable, Offset, Entry),
++          guessVFTableEntry1(VFTable, Offset, Entry),
++          TupleSet),
++    tryBinarySearch(tryVFTableEntry, tryNOTVFTableEntry, TupleSet).
++
++guessVFTableEntry :-
++    osetof((VFTable, Offset, Entry),
++          guessVFTableEntry2(VFTable, Offset, Entry),
+           TupleSet),
+     tryBinarySearch(tryVFTableEntry, tryNOTVFTableEntry, TupleSet).
+ 
+@@ -948,11 +977,11 @@ tryNOTMergeClasses(Method1, Method2) :-
+ % --------------------------------------------------------------------------------------------
+ guessRealDestructor :-
+     minof(Method,
+-	  (likelyDeletingDestructor(DeletingDestructor, Method),
+-	   % Require that we've already confirmed the deleting destructor.
+-	   factDeletingDestructor(DeletingDestructor),
+-	   not(factRealDestructor(Method)),
+-	   not(factNOTRealDestructor(Method)))),
++          (likelyDeletingDestructor(DeletingDestructor, Method),
++           % Require that we've already confirmed the deleting destructor.
++           factDeletingDestructor(DeletingDestructor),
++           not(factRealDestructor(Method)),
++           not(factNOTRealDestructor(Method)))),
+ 
+     guessRealDestructor(Method).
+ 
+@@ -1059,9 +1088,9 @@ tryNOTRealDestructor(Method) :-
+ 
+ guessDeletingDestructor :-
+     minof(Method,
+-	  (likelyDeletingDestructor(Method, _RealDestructor),
+-	   not(factDeletingDestructor(Method)),
+-	   not(factNOTDeletingDestructor(Method)))),
++          (likelyDeletingDestructor(Method, _RealDestructor),
++           not(factDeletingDestructor(Method)),
++           not(factNOTDeletingDestructor(Method)))),
+ 
+     guessDeletingDestructor(Method).
+ 
+diff --git a/share/prolog/oorules/initial.P b/share/prolog/oorules/initial.P
+old mode 100644
+new mode 100755
+index 50f6589..c8bab8f
+--- a/share/prolog/oorules/initial.P
++++ b/share/prolog/oorules/initial.P
+@@ -55,6 +55,21 @@ possibleVBTableEntry(VBTable, NewOffset, Value) :-
+     not(possibleVBTableWrite(_Insn, _Method, _Offset, Address)),
+     initialMemory(Address, Value).
+ 
++% --------------------------------------------------------------------------------------------
++:- table possibleMethod/1 as opaque.
++
++% There's at least some evidence that that address is a function.  Primarily used for
++% separating plausible methods from arbitrary addresses during guessing.
++possibleMethod(Address) :-
++    callingConvention(Address, _CallingConvention);
++    thisCallMethod(Address, _, _);
++    thunk(Address, _Target1);
++    noCallsAfter(Address);
++    noCallsBefore(Address);
++    returnsSelf(Address);
++    purecall(Address);
++    callTarget(_Insn, Address, _Target2).
++
+ % --------------------------------------------------------------------------------------------
+ :- table possibleVFTable/1 as opaque.
+ 
+@@ -186,6 +201,21 @@ validMethodMemberAccess(Insn, Method, Offset, Size) :-
+     factMethod(Method),
+     not(invalidMethodMemberAccess(Method)).
+ 
++:- table invalidMethodMemberWrite/1 as opaque.
++
++invalidMethodMemberWrite(Method) :-
++    methodMemberWrite(_Insn, Method, Offset, _Size, _ThisPtr, _isITE, _HashList),
++    Offset >= 0x100000.
++
++:- table validMethodMemberWrite/4 as incremental.
++
++validMethodMemberWrite(Insn, Method, Offset, Size) :-
++    debug('Called valid Member Write:'),
++    methodMemberWrite(Insn, Method, Offset, _, _, _),
++    debug('Called valid Method Access:'),
++    validMethodMemberAccess(Insn, Method, Offset, Size),
++    debug('Passed valid Method Access:').
++
+ % ============================================================================================
+ % Thunk handling...
+ % ============================================================================================
+diff --git a/share/prolog/oorules/rules.P b/share/prolog/oorules/rules.P
+old mode 100644
+new mode 100755
+index 36c1910..929641e
+--- a/share/prolog/oorules/rules.P
++++ b/share/prolog/oorules/rules.P
+@@ -101,8 +101,9 @@ reasonMethod_L(Method) :-
+     factMethod(Caller),
+     % Intentionally NOT a validFuncOffset!
+     funcOffset(_Insn1, Caller, Method, 0),
++    % debug('reasonMethod_L('), debug(Method), debugln(').'),
+     %logtrace('reasonMethod_L('), logtrace(Method), logtraceln(').'),
+-    % Require that the Method also read/use the value.
++    % Require that the Method also read/use the valu
+     funcParameter(Method, ecx, _SymbolicValue),
+     %logtrace('reasonMethod_L('), logtrace(Method), logtraceln(').'),
+     true.
+@@ -618,7 +619,15 @@ reasonVFTableOverwrite(VFTable1, VFTable2, Offset) :-
+     possibleVFTableOverwrite(_Insn1, _Insn2, Method, Offset, VFTable1, VFTable2),
+     factVFTable(VFTable1),
+     factVFTable(VFTable2),
+-    factConstructor(Method).
++    factConstructor(Method),
++
++    % Debugging
++    %not(factVFTableOverwrite(VFTable1, VFTable2, Offset)),
++    %logtrace('reasonVFTableOverwrite_A('),
++    %logtrace(VFTable1), logtrace(', '),
++    %logtrace(VFTable2), logtrace(', '),
++    %logtrace(Offset), logtraceln(').'),
++    true.
+ 
+ % Because VFTable1 is overwritten by VFTable2, and the method is a NOT a constructor, so we're
+ % overwriting tables in the "opposite" direction, meaning that the order of the instructions is
+@@ -635,7 +644,15 @@ reasonVFTableOverwrite(VFTable2, VFTable1, Offset) :-
+     % a VFTable write, so it's a bit duplicative here.  In the end, factNOTConstructor() may be
+     % sufficient even if it's a little confusing.
+     certainConstructorOrDestructor(Method),
+-    factNOTConstructor(Method).
++    factNOTConstructor(Method),
++
++    % Debugging
++    %not(factVFTableOverwrite(VFTable2, VFTable1, Offset)),
++    %logtrace('reasonVFTableOverwrite_B('),
++    %logtrace(VFTable2), logtrace(', '),
++    %logtrace(VFTable1), logtrace(', '),
++    %logtrace(Offset), logtraceln(').'),
++    true.
+ 
+ % --------------------------------------------------------------------------------------------
+ % A new approach to associating VFTables with Classes?  This is not a fact concluding rule
+@@ -1815,6 +1832,7 @@ reasonMergeClasses_B(BaseClass, MethodClass) :-
+     iso_dif(BaseClass, MethodClass),
+ 
+     % Debugging.
++    %not(find(BaseClass, MethodClass)),
+     %logtrace('reasonMergeClasses_B('),
+     %logtrace(BaseClass), logtrace(', '),
+     %logtrace(MethodClass), logtrace(', '),
+@@ -1845,30 +1863,50 @@ reasonMergeClasses_C(Class, ExistingClass) :-
+     not(factObjectInObject(ExistingClass, _0InnerClass, 0)),
+ 
+     % Debugging
+-    %not(find(Class1, Class2)),
++    %not(find(Class, ExistingClass)),
+     %logtrace('reasonMergeClasses_C('),
+     %logtrace(Class), logtrace(', '),
+     %logtrace(ExistingClass), logtraceln(').'),
+     true.
+ 
++% If there are two implementations of the constructor on the same class, they should be merged
++% into a single class.  For example Cls1(int x) and Cls1(char y).  When the class has virtual
++% methods, this case can be easily detected by observing that the same VFTable is written into
++% offset zero of the object.  Unfortunately, the inlining of base class constructors can
++% confuse this simple rule, because there is more than one VFTableWrite in the constructor (one
++% for this class and one for the inlined base class).  The solution is to block this rule from
++% applying in the cases where the VFTable is overwritten (the VFTable from the inlined base
++% class constructor).
+ % PAPER: Merging-1
+ % ED_PAPER_INTERESTING
+ reasonMergeClasses_D(Method1, Method2) :-
+-    % There's some recurring confusion about _which_ tables must be the same.  In particular
+-    % when base class constructors are inlined and in multiple/virtual inheritance scenarios.
+-    % In the strictest form, this rule would require that both offsets be zero.  In the loosest
+-    % form, any two VFTable writes would be sufficient to merge them.  These rules need more
+-    % discussion about what the compiler might actually generate.  Currently, we require that
+-    % they match which is sort of midway inbetween.  Regardless of what the correct logic is,
+-    % it's important that this rule continue to match the constraint, since allowing the two to
+-    % be out of sync can result in excessive backtracking.
+-    factVFTableWrite(_Insn1, Method1, ObjectOffset, VFTable),
+-    factVFTableWrite(_Insn2, Method2, ObjectOffset, VFTable),
+-
+-    % Method1 and Method2 cannot be purecall already.
+-
+-    % And the VFTable we're basing this conclusion on is not an overwritten VFTable.
+-    not(factVFTableOverwrite(VFTable, _OtherVFTable, _OtherOffset)),
++    % We've been back and forth several times about whether the object offset that the VFTable
++    % address is written into should bound to zero or not.  Cory currently believes that while
++    % the rule _might_ apply in cases where the offset is non-zero, the obvious case occurs
++    % when the offset is zero.  Instances of object embedding at non-zero offsets might
++    % coincidentally be unrelated classes that happen to embed something at the same offset.
++    % Instances of multiple inheritance should always be accompanied by a VFTable at offset
++    % zero that will trigger the rule.  The interesting case is when our knowledge is
++    % imperfect because the VFTableWrite at offset zero has not been proven yet.  In those
++    % cases it's unclear if a weaker restriction on ObjectOffset would be helpful.
++    ObjectOffset = 0,
++
++    % Find two different methods that both install the same VFTable at the same offset.
++    factVFTableWrite(Insn1, Method1, ObjectOffset, VFTable),
++    factVFTableWrite(Insn2, Method2, ObjectOffset, VFTable),
++    % Just to block the silliness of picking the same method as early as possible.
++    iso_dif(Method1, Method2),
++    % Method1 and Method2 cannot be purecall already (due to factVFTableWrite)
++
++    % Neither VFTable write may be overwritten by any other VFTable.  Use the unproven
++    % possibleVFTableOverwrite facts here, because this is an exception to the rule, and we may
++    % not have yet proven the pre-requisites to know that the overwrites are proven.  But we
++    % should not merge classes until we're sure that this exception does NOT apply!
++    % Unfortunately, because there's no way to "disprove" the possible facts, we'll never apply
++    % this rule if the possibilty of an exception exists.  That's ok because we can always
++    % merge for other proven reasons, or guess that this is a legitimate class merge.
++    not(possibleVFTableOverwrite(Insn1, _OtherInsn2, Method1, ObjectOffset, VFTable, _OtherVFTable1)),
++    not(possibleVFTableOverwrite(Insn2, _OtherInsn3, Method2, ObjectOffset, VFTable, _OtherVFTable2)),
+ 
+     % And the existing classes are not the same already, which is obviously wrong...
+     find(Method1, Class1),
+@@ -1996,7 +2034,7 @@ reasonMergeClasses_H(DerivedClass, MethodClass) :-
+     find(Method, MethodClass),
+     iso_dif(DerivedClass, MethodClass),
+     % Debugging
+-    %not(find(Class1, Class2)),
++    %not(find(DerivedClass, MethodClass)),
+     %logtrace('reasonMergeClasses_H('),
+     %logtrace(DerivedVFTable), logtrace(', '),
+     %logtrace(BaseVFTable), logtrace(', '),
+diff --git a/share/prolog/oorules/setup.P b/share/prolog/oorules/setup.P
+old mode 100644
+new mode 100755
+index 458d55e..9a1cd08
+--- a/share/prolog/oorules/setup.P
++++ b/share/prolog/oorules/setup.P
+@@ -15,6 +15,16 @@
+ :- dynamic thisCallMethod/3.
+ :- index(methodMemberAccess/4, [2+3,2]).
+ :- dynamic methodMemberAccess/4.
++:- index(methodMemberWrite/6, [1,2,3,4,5,6]).
++:- dynamic methodMemberWrite/6.
++:- index(possibleEmbeddedObjectPtr/2,[1,2]).
++:- dynamic possibleEmbeddedObjectPtr/2.
++:- index(possibleAssociationPtr/5,[1,2,3,4,5]).
++:- dynamic possibleAssociationPtr/5.
++:- index(possibleAssociationValue/5,[1,2,3,4,5]).
++:- dynamic possibleAssociationValue/5.
++:- index(thisPtrEquivalence/2,[1,2]).
++:- dynamic thisPtrEquivalence/2.
+ :- dynamic returnsSelf/1.
+ :- dynamic noCallsBefore/1.
+ :- dynamic noCallsAfter/1.
+@@ -70,6 +80,9 @@
+ :- index(callReturn/4, [1,2,3,4]).
+ :- dynamic callReturn/4.
+ 
++:- index(exportedAssociation/3, [1,2,3]).
++:- dynamic exportedAssociation/3 as incremental.
++
+ % For Debugging, not for rules!
+ %:- index(termDebug/2, [1,2]).
+ %:- dynamic termDebug/2 as incremental.
+diff --git a/share/prolog/oorules/validate.P b/share/prolog/oorules/validate.P
+old mode 100644
+new mode 100755

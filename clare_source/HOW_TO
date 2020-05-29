@@ -1,0 +1,13 @@
+# How to build CLARE?
+Since CLARE is build on the top of Pharos Binary Analysis framework, we have provided the patches(in the same folder) that needs to be applied on the pharos commit version: acd621b8c8b90dd4260c7860f7bd34bf867c3add. We could not provide a single stand-alone binary since there are a lot of dependencies of OOAnalyzer and CLARE, sorry for that.<br>
+
+In order to build CLARE from the source code, follow these steps:<br>
+	1) Install OOAnalyzer by following the instruction given here: https://github.com/cmu-sei/pharos/blob/master/INSTALL.md. It is preferable to use the docker image as it hasa pre-built image which is ready to use and can some a lot of time. <br>
+	2) Checkout OOAnalyzer to commit id: acd621b8c8b90dd4260c7860f7bd34bf867c3add. Current version of OOAnalyzer is incompatible with CLARE and some more work is required to fix that. <br>
+	3) Apply the patches given in this folder. <br>
+	4) Recompile and install OOAnalyzer. <br>
+
+# How to test CLARE?
+First make sure that you have enough RAM on the server. We need around 50GB RAM to test the benchmarks we have used. Try running OOAnalyzer on a small test binary, just to make sure that every thing is working. Now, we can test it on larger DLLs by using the following option:  " --timeout 20000 --partitioner-timeout 20000 --maximum-memory 20000 --maximum-nodes-per-condition 1000 --per-function-maximum-memory 1500 --threads 5 --prolog-exports exports.P --prolog-facts fact.log --prolog-results result.log dll_name.dll". Current version of CLARE is a prototype version and is far from perfect. <br>
+
+Please note that we have not released CLARE under an open-source license. We have provided the source code for the sole purpose of a fair evaluation and thus, it should not be re-distributed in any form.

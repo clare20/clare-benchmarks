@@ -1,0 +1,1085 @@
+diff --git a/libpharos/method.cpp b/libpharos/method.cpp
+old mode 100644
+new mode 100755
+index 1668c8c..2e628f2
+--- a/libpharos/method.cpp
++++ b/libpharos/method.cpp
+@@ -10,12 +10,20 @@
+ 
+ namespace pharos {
+ 
+-Member::Member(unsigned int o, unsigned int s, SgAsmX86Instruction* i, bool b) {
++Member_usage::Member_usage(SgAsmX86Instruction* i, bool ite, std::vector<std::string> list){
++  is_ite = ite;
++  sv_list.insert(sv_list.end(), list.begin(),list.end());
++}
++
++Member::Member(unsigned int o, unsigned int s, SgAsmX86Instruction* i, bool b, Member_usage u) {
+   offset = o;
+   size = s;
+ 
+   // Add the instruction to the list of using instructions.
+   using_instructions.insert(i);
++  // Add member usages to the list of reported member usages
++  usage_list.insert(u);
+ 
+   base_table = b;
+ }
+@@ -32,6 +40,7 @@ void Member::merge(Member& m) {
+   // usage, or whether this behavior should be restricted to members referenced from a class
+   // description, and how we might go about enforcing that restriction.
+   using_instructions.insert(m.using_instructions.begin(), m.using_instructions.end());
++  usage_list.insert(m.usage_list.begin(),m.usage_list.end());
+ }
+ 
+ // Order methods by their addresses.
+@@ -406,7 +415,27 @@ void ThisCallMethod::find_members() {
+           if (!offset) continue;
+ 
+           if (*offset >= 0) {
+-            add_data_member(Member(*offset, aa.get_byte_size(), insn, false));
++            std::vector<std::string> list;
++            bool is_ite = 0;
++            const SymbolicValuePtr stack_addr = aa.value;
++            std::string thisptr_term = "sv_" + std::to_string(stack_addr->get_hash());
++
++            if(!aa.isRead){
++              std::cout<<"Hash : "<<thisptr_term <<"   val: "<<to_string(*stack_addr)<<"\n";
++              list.push_back(thisptr_term);
++              if (stack_addr->contains_ite()){
++                is_ite = 1;
++                TreeNodePtrSet possible_val_set = stack_addr->get_possible_values();
++                if (possible_val_set.size() > 1) {
++                  for (auto ite_elm : possible_val_set) {
++                    std::string temp = "sv_"+ std::to_string(ite_elm->hash());
++                    std::cout<<"Hash : "<<temp <<"   val: "<<to_string(*ite_elm)<<"\n";
++                    list.push_back(temp);
++                  }
++                }
++              }
++            }
++            add_data_member(Member(*offset, aa.get_byte_size(), insn, false, Member_usage(insn, is_ite, list)));
+           }
+           else {
+             GDEBUG << "Ignoring negative object offset (" << *offset
+@@ -427,10 +456,30 @@ void ThisCallMethod::find_members() {
+         if (!offset) continue;
+ 
+         if (*offset >= 0) {
++          std::vector<std::string> list;
++          bool is_ite = 0;
++          const SymbolicValuePtr stack_addr = aa.value;
++          std::string thisptr_term = "sv_" + std::to_string(stack_addr->get_hash());
++
++          if(!aa.isRead){
++          	std::cout<<"Hash : "<<thisptr_term <<"   val: "<<to_string(*stack_addr)<<"\n";
++            list.push_back(thisptr_term);
++            if (stack_addr->contains_ite()){
++              is_ite = 1;
++              TreeNodePtrSet possible_val_set = stack_addr->get_possible_values();
++              if (possible_val_set.size() > 1) {
++                for (auto ite_elm : possible_val_set) {
++                  std::string temp = "sv_"+ std::to_string(ite_elm->hash());
++                  std::cout<<"Hash : "<<temp <<"   val: "<<to_string(*ite_elm)<<"\n";
++                  list.push_back(temp);
++                }
++              }
++            }
++          }
+           // Add the member to the method.  Calling get_byte_size() is more accurate than
+           // reading sizes off of the operands (e.g. movsd) which we're probably not handling
+           // correctly anyway, but it's also simpler.
+-          add_data_member(Member(*offset, aa.get_byte_size(), insn, false));
++          add_data_member(Member(*offset, aa.get_byte_size(), insn, false, Member_usage(insn, is_ite, list)));
+         }
+         else {
+           GDEBUG << "Ignoring negative object offset (" << *offset
+@@ -446,7 +495,27 @@ void ThisCallMethod::find_members() {
+         if (!offset) continue;
+ 
+         if (*offset >= 0) {
+-          add_data_member(Member(*offset, aa.get_byte_size(), insn, false));
++
++          std::vector<std::string> list;
++          bool is_ite = 0;
++          const SymbolicValuePtr stack_addr = aa.value;
++          std::string thisptr_term = "sv_" + std::to_string(stack_addr->get_hash());
++          if(!aa.isRead){
++            std::cout<<"Hash : "<<thisptr_term <<"   val: "<<to_string(*stack_addr)<<"\n";
++            list.push_back(thisptr_term);
++            if (stack_addr->contains_ite()){
++              is_ite = 1;
++              TreeNodePtrSet possible_val_set = stack_addr->get_possible_values();
++              if (possible_val_set.size() > 1) {
++                for (auto ite_elm : possible_val_set) {
++                  std::string temp = "sv_"+ std::to_string(ite_elm->hash());
++                  std::cout<<"Hash : "<<temp <<"   val: "<<to_string(*ite_elm)<<"\n";
++                  list.push_back(temp);
++                }
++              }
++            }
++          }
++          add_data_member(Member(*offset, aa.get_byte_size(), insn, false, Member_usage(insn, is_ite, list)));
+         }
+         else {
+           GDEBUG << "Ignoring negative object offset (" << *offset
+@@ -571,7 +640,11 @@ bool ThisCallMethod::validate_vtable(ConstVirtualTableInstallationPtr install) {
+   size_t arch_bytes = fd->ds.get_arch_bytes();
+ 
+   SgAsmX86Instruction* x86insn = isSgAsmX86Instruction(insn);
+-  add_data_member(Member(install->offset, arch_bytes, x86insn, install->base_table));
++
++  // If the instruction is installing a VFTable pointer, then we don't really have to
++  // find the symbolic value of the value being written. right?
++  std::vector<std::string> list;
++  add_data_member(Member(install->offset, arch_bytes, x86insn, install->base_table, Member_usage(x86insn, 0, list)));
+   return true;
+ }
+ 
+diff --git a/libpharos/method.hpp b/libpharos/method.hpp
+old mode 100644
+new mode 100755
+index 44b7284..245e2a5
+--- a/libpharos/method.hpp
++++ b/libpharos/method.hpp
+@@ -43,6 +43,27 @@ public:
+ };
+ 
+ 
++class Member_usage {
++
++public:
++  // The instruction that does the call in question.
++  SgAsmX86Instruction* insn;
++
++  // Symbolic validate_vtablephaues of operands in the instruction
++  std::vector<std::string> sv_list;
++
++  // Is the expression ITE?
++  bool is_ite;
++
++  Member_usage(SgAsmX86Instruction* i, bool is_ite, std::vector<std::string> list);
++};
++
++class MemberUsageCompare {
++  public:
++  bool operator()(const Member_usage x, const Member_usage y)
++    const { return (x.insn->get_address() < y.insn->get_address()); }
++};
++
+ // This class is just so that we could eliminate maps of pairs, and be clear about what
+ // represents a "member".  This should probably be replaced with a class that we've given some
+ // thought to -- in particular Jeff Gennari made some progress in this area I think.
+@@ -65,7 +86,9 @@ public:
+   // also provide the evidence for the embedded ctors list below.
+   X86InsnSet using_instructions;
+ 
+-  Member(unsigned int o, unsigned int s, SgAsmX86Instruction* i, bool b);
++  std::set<Member_usage,MemberUsageCompare> usage_list;
++
++  Member(unsigned int o, unsigned int s, SgAsmX86Instruction* i, bool b, Member_usage u);
+ 
+   // Member (in)equality is determined by comparing size and offset for two different members
+   friend bool operator== (Member &m1, Member &m2) {
+diff --git a/libpharos/ooanalyzer.cpp b/libpharos/ooanalyzer.cpp
+old mode 100644
+new mode 100755
+index 939620d..1d2cb70
+--- a/libpharos/ooanalyzer.cpp
++++ b/libpharos/ooanalyzer.cpp
+@@ -48,7 +48,7 @@ bool OOAnalyzer::identify_new_method(FunctionDescriptor const & fd) {
+     if (new_addrs.find(fdaddr) != new_addrs.end()) {
+       // This logic is a little strange now.  We used to set the flag on the function
+       // descriptor, and now we're just incrementing the found count since calling
+-      // set_new_method() would just attempt to add it to the set (again).  But we still want
++      // set_new_method() would just attempt to add it to the set (again).  BuTreeNodePtrSett we still want
+       // to increment the counter rather than just report the length of new_addrs because we
+       // stuck some addresses in there without actually confirming that they exist.  This
+       // should be moot in FunctionFinder.
+@@ -66,6 +66,63 @@ bool OOAnalyzer::identify_new_method(FunctionDescriptor const & fd) {
+   return false;
+ }
+ 
++bool OOAnalyzer::identify_std_insert(FunctionDescriptor const & fd) {
++  std::string sig = fd.get_pic_hash();
++  rose_addr_t fdaddr = fd.get_address();
++  {
++    read_guard<decltype(mutex)> guard{mutex};
++    if (std_insert_addrs.find(fdaddr) != std_insert_addrs.end()) {
++
++      std_insert_methods_found++;
++      return true;
++    }
++  }
++  if (std_insert_hashes.find(sig) != std_insert_hashes.end()) {
++    set_std_insert_method(fdaddr);
++    std_insert_methods_found++;
++    return true;
++  }
++  return false;
++}
++
++bool OOAnalyzer::identify_std_ucitr(FunctionDescriptor const & fd) {
++  std::string sig = fd.get_pic_hash();
++  rose_addr_t fdaddr = fd.get_address();
++  {
++    read_guard<decltype(mutex)> guard{mutex};
++    if (std_ucitr_addrs.find(fdaddr) != std_ucitr_addrs.end()) {
++
++      std_ucitr_methods_found++;
++      return true;
++    }
++  }
++  if (std_ucitr_hashes.find(sig) != std_ucitr_hashes.end()) {
++    set_std_ucitr_method(fdaddr);
++    std_ucitr_methods_found++;
++    return true;
++  }
++  return false;
++}
++
++bool OOAnalyzer::identify_push_back(FunctionDescriptor const & fd) {
++  std::string sig = fd.get_pic_hash();
++  rose_addr_t fdaddr = fd.get_address();
++  {
++    read_guard<decltype(mutex)> guard{mutex};
++    if (push_back_addrs.find(fdaddr) != push_back_addrs.end()) {
++
++      push_back_methods_found++;
++      return true;
++    }
++  }
++  if (push_back_hashes.find(sig) != push_back_hashes.end()) {
++    set_push_back_method(fdaddr);
++    push_back_methods_found++;
++    return true;
++  }
++  return false;
++}
++
+ bool OOAnalyzer::identify_delete_method(FunctionDescriptor const & fd) {
+   std::string sig = fd.get_pic_hash();
+   rose_addr_t fdaddr = fd.get_address();
+@@ -164,6 +221,9 @@ bool OOAnalyzer::identify_nonreturn_method(FunctionDescriptor & fd) {
+ void OOAnalyzer::visit(FunctionDescriptor* fd) {
+   GINFO << "Processing function " << fd->address_string() << LEND;
+   identify_new_method(*fd);
++  identify_std_insert(*fd);
++  identify_std_ucitr(*fd);
++  identify_push_back(*fd);
+   identify_delete_method(*fd);
+   identify_purecall_method(*fd);
+   identify_nonreturn_method(*fd);
+@@ -355,6 +415,43 @@ void OOAnalyzer::initialize_known_method_hashes() {
+ 
+   // __CxxThrowException@8 from ooex_vs2010/Lite test cases.
+   nonreturn_hashes.insert("DD6F67B0A531EF4450EB8990F6FF3849");
++
++  // Dcmdata MSVS 12
++  std_insert_hashes.insert("449737A1D12FAC3783992C4EB0F386B4");
++  std_insert_hashes.insert("CC57C47371A0BE677B61C1851649C926");
++  std_insert_hashes.insert("CB169317F1A94102A0B637F2B71DF864");
++  std_insert_hashes.insert("AC87783E71032620D571A441E5177FF5");
++
++  // CPPUNIT MSVS 10
++  std_insert_hashes.insert("E6C555013DA761F601214DCA08F3D10C");
++  std_insert_hashes.insert("8BABFD0B91D3EB3B831421E61A7B4C3B");
++  std_insert_hashes.insert("53056B06F6DADE67A213AB8B102AFE90");
++
++  // Oflog MSVS 12
++  std_insert_hashes.insert("FBB8679E0BD24974207F9ADB20C6F353");
++  std_insert_hashes.insert("1421A33A6E8B5C01859AF4FC66688616");
++  std_insert_hashes.insert("489A7925B34A343BE5A8DFA2411DB62F");
++
++  // Dcmdata MSVS 12
++  std_ucitr_hashes.insert("4C4A823CFB5D6438B84D33E63DECB9CF");
++
++  // CppUnit MSVS 10
++  std_ucitr_hashes.insert("5ACFDDA774171AE7B5CC4D8229C49DF2");
++  std_ucitr_hashes.insert("D12644336FF3B1E06FD1D70F9FCF07A9");
++
++  // dcmdata MSVS 12
++  push_back_hashes.insert("A7455AE6073A68406F3CE127A1CF821B");
++
++  // Cppunit MSVS 10
++  push_back_hashes.insert("B4E5120BC647B1E7BC530FAAEEC7E27D");
++  push_back_hashes.insert("F61EC43010859A64D2F7B8BA1BA7458B");
++  push_back_hashes.insert("53056B06F6DADE67A213AB8B102AFE90");
++  push_back_hashes.insert("C908505621C760C17B7B586129881BDC");
++
++  // Oflog MSVS 12
++  push_back_hashes.insert("B777AA846826DC27922BBA656A3D041D");
++  push_back_hashes.insert("A080CECC91BB37952BABAD7E6D696559");
++  push_back_hashes.insert("E5087E2CD69B856416E23600FB1990BB");
+ }
+ 
+ // Find new methods by examining imports.
+diff --git a/libpharos/ooanalyzer.hpp b/libpharos/ooanalyzer.hpp
+old mode 100644
+new mode 100755
+index ae755ab..96f70f4
+--- a/libpharos/ooanalyzer.hpp
++++ b/libpharos/ooanalyzer.hpp
+@@ -105,6 +105,9 @@ private:
+   void record_this_ptrs_for_calls(FunctionDescriptor* fd);
+ 
+   bool identify_new_method(FunctionDescriptor const & fd);
++  bool identify_std_insert(FunctionDescriptor const & fd);
++  bool identify_std_ucitr(FunctionDescriptor const & fd);
++  bool identify_push_back(FunctionDescriptor const & fd);
+   bool identify_delete_method(FunctionDescriptor const & fd);
+   bool identify_purecall_method(FunctionDescriptor const & fd);
+   bool identify_nonreturn_method(FunctionDescriptor & fd);
+@@ -116,6 +119,22 @@ private:
+       write_guard<decltype(mutex)> guard{mutex};
+       new_addrs.insert(addr);
+   }
++
++  void set_std_insert_method(rose_addr_t addr) {
++      write_guard<decltype(mutex)> guard{mutex};
++      std_insert_addrs.insert(addr);
++  }
++
++  void set_std_ucitr_method(rose_addr_t addr) {
++      write_guard<decltype(mutex)> guard{mutex};
++      std_ucitr_addrs.insert(addr);
++  }
++
++  void set_push_back_method(rose_addr_t addr) {
++      write_guard<decltype(mutex)> guard{mutex};
++      push_back_addrs.insert(addr);
++  }
++
+   void set_delete_method(rose_addr_t addr) {
+     {
+       write_guard<decltype(mutex)> guard{mutex};
+@@ -131,6 +150,21 @@ private:
+ 
+ public:
+ 
++  // std::_Insert*
++  std::set<std::string> std_insert_hashes;
++  AddrSet std_insert_addrs;
++  std::atomic<int> std_insert_methods_found;
++
++  // Unchecked Iterator!
++  std::set<std::string> std_ucitr_hashes;
++  AddrSet std_ucitr_addrs;
++  std::atomic<int> std_ucitr_methods_found;
++
++  // std::push_back and push_front
++  std::set<std::string> push_back_hashes;
++  AddrSet push_back_addrs;
++  std::atomic<int> push_back_methods_found;
++
+   OOAnalyzer(DescriptorSet& ds_, const ProgOptVarMap& vm_, AddrSet& new_addrs_);
+ 
+   // External classes need to inspect the tables that we found.
+diff --git a/libpharos/ooclass.cpp b/libpharos/ooclass.cpp
+old mode 100644
+new mode 100755
+index 45bbf55..f6491d6
+--- a/libpharos/ooclass.cpp
++++ b/libpharos/ooclass.cpp
+@@ -44,7 +44,7 @@ OOClassDescriptor::OOClassDescriptor(rose_addr_t cid,
+     }
+ 
+     if (!meth) {
+-      GERROR << "Method address " << addr_str(m) << " was not a function or import." << LEND;
++      std::cout << "Method address " << addr_str(m) << " was not a function or import." << std::endl;
+       continue;
+     }
+ 
+diff --git a/libpharos/ooclass.hpp b/libpharos/ooclass.hpp
+old mode 100644
+new mode 100755
+diff --git a/libpharos/oomember.cpp b/libpharos/oomember.cpp
+old mode 100644
+new mode 100755
+diff --git a/libpharos/oomember.hpp b/libpharos/oomember.hpp
+old mode 100644
+new mode 100755
+diff --git a/libpharos/osolver.cpp b/libpharos/osolver.cpp
+old mode 100644
+new mode 100755
+index 0f73ea7..97c07a2
+--- a/libpharos/osolver.cpp
++++ b/libpharos/osolver.cpp
+@@ -66,7 +66,7 @@ OOSolver::OOSolver(DescriptorSet & ds_, const ProgOptVarMap& vm) : ds(ds_)
+     facts_filename = vm["prolog-facts"].as<std::string>();
+   }
+ 
+-  debug_sv_facts = false;
++  debug_sv_facts = true;
+   if (vm.count("prolog-debug-sv")) {
+     debug_sv_facts = true;
+   }
+@@ -101,6 +101,11 @@ OOSolver::OOSolver(DescriptorSet & ds_, const ProgOptVarMap& vm) : ds(ds_)
+     perform_analysis = true;
+   }
+ 
++  if (vm.count("prolog-exports")) {
++    exports_filename = vm["prolog-exports"].as<std::string>();
++    perform_analysis = true;
++  }
++
+   if (vm.count("json")) {
+     perform_analysis = true;
+   }
+@@ -168,6 +173,9 @@ OOSolver::add_facts(const OOAnalyzer& ooa) {
+     add_thisptr_facts();
+     add_function_facts(ooa);
+     add_import_facts(ooa);
++    add_composition_facts(ooa);
++    add_aggregation_facts(ooa);
++    add_association_facts(ooa);
+   }
+   catch (const Error& error) {
+     GFATAL << error.what() << LEND;
+@@ -219,6 +227,7 @@ OOSolver::add_method_facts(const OOAnalyzer& ooa)
+       if (conventions.size() == 0) status = "notthiscall";
+     }
+ 
++    possible_this_call_meth.insert(tcm->get_address());
+     session->add_fact("thisCallMethod", tcm->get_address(), thisptr_term, status);
+ 
+     // These facts are getting closer to correct, but should still be reviewed once more.
+@@ -245,9 +254,14 @@ OOSolver::add_method_facts(const OOAnalyzer& ooa)
+     }
+ 
+     for (const Member& member : boost::adaptors::values(tcm->data_members)) {
+-      for (const SgAsmX86Instruction* insn : member.using_instructions) {
+-        session->add_fact("methodMemberAccess", insn->get_address(),
++      for (const Member_usage m_use : member.usage_list) {
++        session->add_fact("methodMemberAccess", m_use.insn->get_address(),
+                           tcm->get_address(), member.offset, member.size);
++        if(m_use.sv_list.size() > 0){
++          memberWrite.push_back(m_use);
++          session->add_fact("methodMemberWrite", m_use.insn->get_address(),
++                            tcm->get_address(), member.offset, member.size, m_use.is_ite, m_use.sv_list);
++        }
+       }
+     }
+   }
+@@ -402,6 +416,7 @@ OOSolver::add_rtti_chd_facts(const rose_addr_t addr)
+ void
+ OOSolver::add_usage_facts(const OOAnalyzer& ooa)
+ {
++
+   for (const ObjectUse& obj_use : boost::adaptors::values(ooa.object_uses)) {
+     rose_addr_t func_addr = obj_use.fd->get_address();
+ 
+@@ -424,7 +439,15 @@ OOSolver::add_usage_facts(const OOAnalyzer& ooa)
+         thisptrs.insert(tpu.this_ptr->get_expression());
+         // Each instruction references multiple methods, since the call have multiple targets.
+         for (const ThisCallMethod* called : mepair.second) {
++
+           std::string thisptr_term = "sv_" + std::to_string(tpu.this_ptr->get_hash());
++
++          //std::cout<<"tpu : "<<thisptr_term<<std::endl;
++          //tpu.this_ptr->get_expression()->print(std::cout);
++          //std::cout<<std::endl;
++          //std::cout<<Enum2Str(tpu.alloc_type);
++          //std::cout<<std::endl;
++
+           session->add_fact("thisPtrUsage", meaddr, func_addr,
+                             thisptr_term, called->get_address());
+         }
+@@ -487,12 +510,19 @@ OOSolver::add_call_facts(const OOAnalyzer& ooa)
+       if (debug_sv_facts) {
+         session->add_fact("termDebug", term, to_string(*expr));
+       }
++
++      //std::cout<<term<<std::endl;
++      //expr->print(std::cout);
++      //std::cout<<std::endl;
++
+       if (cpd.is_reg()) {
++
+         std::string regname = unparseX86Register(cpd.get_register(), NULL);
+         session->add_fact("callParameter", cd.get_address(),
+                           callfunc->get_address(), regname, term);
+       }
+       else {
++
+         session->add_fact("callParameter", cd.get_address(),
+                           callfunc->get_address(), cpd.get_num(), term);
+       }
+@@ -548,8 +578,22 @@ OOSolver::add_thisptr_facts()
+       std::string thisptr_term = "sv_" + std::to_string(thisptr->hash());
+       const TreeNodePtr& varptr = ace.variable_portion();
+       std::string variable_term = "sv_" + std::to_string(varptr->hash());
++      //std::cout<<variable_term<<std::endl;
++      //varptr->print(std::cout); std::cout<<std::endl;
+       session->add_fact("thisPtrOffset", variable_term, constant, thisptr_term);
+     }
++
++    // Check for this_ptr equivalence
++    for (const TreeNodePtr& thisptr1 : thisptrs){
++      SymbolicValuePtr thisptr1_sym = SymbolicValue::treenode_instance(thisptr1);
++      SymbolicValuePtr thisptr_sym = SymbolicValue::treenode_instance(thisptr);
++      if(thisptr_sym->can_be_equal(thisptr1_sym) && thisptr1->hash() != thisptr->hash()){
++        // std::cout<<"Equal hai be! ThisPtr equivalence ";
++        // thisptr1->print(std::cout); std::cout<<std::endl;
++        // thisptr->print(std::cout); std::cout<<std::endl;
++        session->add_fact("thisPtrEquivalence", "sv_" + std::to_string(thisptr1->hash()), "sv_" + std::to_string(thisptr->hash()));
++      }
++    }
+   }
+ }
+ 
+@@ -569,6 +613,9 @@ OOSolver::add_function_facts(const OOAnalyzer& ooa)
+     // different classes, even if they jump to the same function.
+     if (fd.is_thunk()) {
+       session->add_fact("thunk", fdaddr, fd.get_jmp_addr());
++      if(possible_this_call_meth.find(fd.get_jmp_addr()) != possible_this_call_meth.end()){
++        possible_this_call_meth.insert(fdaddr);
++      }
+     }
+     else {
+       // Report all calling conventions for all functions (except thunks).
+@@ -592,6 +639,8 @@ OOSolver::add_function_facts(const OOAnalyzer& ooa)
+         if (ooa.ds.get_global(expr->toInt()) == NULL) continue;
+       }
+       std::string term = "sv_" + std::to_string(expr->hash());
++      session->add_fact("termDebug", term, to_string(*expr));
++
+       if (fpd.is_reg()) {
+         std::string regname = unparseX86Register(fpd.get_register(), NULL);
+         session->add_fact("funcParameter", fdaddr, regname, term);
+@@ -655,7 +704,7 @@ OOSolver::add_import_facts(const OOAnalyzer& ooa)
+         assert(!dtype->name.empty());
+ 
+         session->add_fact("symbolClass", id.get_address(), clsname, method_name);
+-
++        possible_this_call_meth.insert(id.get_address());
+ 
+         if (dtype->name.front()->is_ctor) {
+           session->add_fact("symbolProperty", id.get_address(), Constructor);
+@@ -688,6 +737,209 @@ OOSolver::add_import_facts(const OOAnalyzer& ooa)
+   }
+ }
+ 
++void
++OOSolver::add_composition_facts(const OOAnalyzer& ooa){
++  std::set<std::string> this_ptr_hash;
++  for(const TreeNodePtr& thisptr : thisptrs){
++    std::string thisptr_term = "sv_" + std::to_string(thisptr->hash());
++    this_ptr_hash.insert(thisptr_term);
++  }
++  for(auto m_use : memberWrite){
++    for(std::string ele_hash : m_use.sv_list){
++      if(this_ptr_hash.find(ele_hash) != this_ptr_hash.end()){
++        rose_addr_t addr = m_use.insn->get_address();
++        session->add_fact("possibleEmbeddedObjectPtr",addr, ele_hash);
++      }
++    }
++  }
++}
++
++void
++OOSolver::add_aggregation_facts(const OOAnalyzer& ooa){
++  for(auto meth_pb : ooa.push_back_addrs){
++
++    const FunctionDescriptor* fd = ooa.ds.get_func(meth_pb);
++
++    for (FunctionDescriptor* tfd : fd->get_thunks()) {
++      for (const rose_addr_t saddr : tfd->get_callers()) {
++        const CallDescriptor* cd = ooa.ds.get_call(saddr);
++        const ParameterList& call_params = cd->get_parameters();
++        auto cparams = call_params.get_params();
++        for (const ParameterDefinition& cpd : cparams) {
++          if (!cpd.get_value()) continue;
++          TreeNodePtr expr = cpd.get_expression();
++          if (!expr) continue;
++          // If the expression is a constant and not a global variable we do not want to export it.
++          if (expr->isNumber()) {
++            if (expr->nBits() > 64) continue;
++            if (ooa.ds.get_global(expr->toInt()) == NULL) continue;
++          }
++          std::string term = "sv_" + std::to_string(expr->hash());
++
++          // Check if cpd is in ECX register, if so, ignore it.
++          if (cpd.is_reg()) {
++            std::string regname = unparseX86Register(cpd.get_register(), NULL);
++            if(regname == "ecx") continue;
++          }
++
++          // Check this expr with this_ptrs and func_params of containing func
++          for (const TreeNodePtr& thisptr1 : thisptrs){
++            SymbolicValuePtr thisptr1_sym = SymbolicValue::treenode_instance(thisptr1);
++            SymbolicValuePtr thisptr_sym = SymbolicValue::treenode_instance(expr);
++
++            if(thisptr_sym->can_be_equal(thisptr1_sym) && thisptr1->hash() != expr->hash()){
++              session->add_fact("thisPtrEquivalence", "sv_" + std::to_string(thisptr1->hash()), "sv_" + std::to_string(expr->hash()));
++            }
++          }
++
++          // Check with func_param
++          auto *ffd = cd->get_containing_function();
++          const ParameterList& func_params1 = ffd->get_parameters();
++          auto fparams1 = func_params1.get_params();
++          for (const ParameterDefinition& fpd1 : fparams1) {
++            if (!fpd1.get_value()) continue;
++            TreeNodePtr expr1 = fpd1.get_expression();
++            SymbolicValuePtr expr_sym = SymbolicValue::treenode_instance(expr);
++            SymbolicValuePtr expr1_sym = SymbolicValue::treenode_instance(expr1);
++            if(expr_sym->can_be_equal(expr1_sym) && expr1->hash() != expr->hash()){
++              session->add_fact("thisPtrEquivalence", "sv_" + std::to_string(expr1->hash()), "sv_" + std::to_string(expr->hash()));
++            }
++          }
++
++        }
++      }
++    }
++    session->add_fact("std_push_back_meth", meth_pb);
++  }
++  for(auto meth_std_ins : ooa.std_insert_addrs){
++    session->add_fact("std_insert_meth", meth_std_ins);
++  }
++  for(auto meth_std_ucitr : ooa.std_ucitr_addrs){
++    session->add_fact("std_ucitr_meth", meth_std_ucitr);
++  }
++}
++
++void
++OOSolver::add_association_facts(const OOAnalyzer& ooa){
++
++
++	if (exports_filename.size() != 0) {
++
++		std::ifstream exports_file;
++		exports_file.open(exports_filename);
++		std::string str;
++
++  		if (!exports_file.is_open()) {
++    		GERROR << "Unable to open prolog exports file '" << exports_filename << "'." << LEND;
++  		}
++
++  		while (std::getline(exports_file, str)) {
++  			std::cout<<"Exporting: "<<str<<"\n";
++  			std::istringstream iss(str);
++			std::vector<std::string> results(std::istream_iterator<std::string>{iss},
++                                 			std::istream_iterator<std::string>());
++  			session->add_fact(std::string("exportedAssociation"), parse_number(results.at(0)), results.at(1), parse_number(results.at(2)));
++		}
++	}
++
++  //Check for pass-by-referenece type of Association
++
++  const CallDescriptorMap& call_map = ooa.ds.get_call_map();
++  for (const CallDescriptor& cd : boost::adaptors::values(call_map)) {
++
++    FunctionDescriptor* callfunc = cd.get_containing_function();
++    if (!callfunc) continue;
++    // For each target of the call, consider whether it calls operator delete().
++    for (rose_addr_t target : cd.get_targets()) {
++
++      //std::cout<<"checking for target: "<<addr_str(target)<<std::endl;
++      if(possible_this_call_meth.find(target) != possible_this_call_meth.end()){
++        //std::cout<<"here"<<std::endl;
++        const ParameterList& call_params = cd.get_parameters();
++        auto cparams = call_params.get_params();
++        for (const ParameterDefinition& cpd : cparams) {
++	  if (!cpd.get_value()) continue;
++          TreeNodePtr expr = cpd.get_expression();
++
++	  //std::cout<<"checking for target: "<<addr_str(target)<<std::endl;
++          if (!expr) continue;
++          // If the expression is a constant and not a global variable we do not want to export it.
++
++	  if (expr->isNumber()) {
++            if (expr->nBits() > 64) continue;
++            if (ooa.ds.get_global(expr->toInt()) == NULL) continue;
++          }
++
++          if (cpd.is_reg()) {
++            std::string regname = unparseX86Register(cpd.get_register(), NULL);
++            if(regname == "ecx") {
++		const ParameterList& call_func_params = callfunc->get_parameters();
++	        auto call_fparams = call_func_params.get_params();
++	        for (const ParameterDefinition& cfpd : call_fparams) {
++			if (!cfpd.get_value()) continue;
++			TreeNodePtr call_expr = cfpd.get_expression();
++	                if (!call_expr) continue;
++			if (call_expr->isNumber()) {
++				if (call_expr->nBits() > 64) continue;
++				if (ooa.ds.get_global(call_expr->toInt()) == NULL) continue;
++			}
++			SymbolicValuePtr callfcn_param_sym = SymbolicValue::treenode_instance(call_expr);
++			SymbolicValuePtr ecx_thisptr1_sym = SymbolicValue::treenode_instance(expr);
++
++			if(callfcn_param_sym->can_be_equal(ecx_thisptr1_sym)){
++				session->add_fact("thisPtrEquivalence", "sv_" + std::to_string(call_expr->hash()), "sv_" + std::to_string(expr->hash()));
++			}
++		}
++
++		continue;
++	    }
++          }
++	  //std::cout<<"checking for target: "<<addr_str(target)<<std::endl;
++          SymbolicValuePtr sym_expr = SymbolicValue::treenode_instance(expr);
++          for (const TreeNodePtr& thisptr1 : thisptrs){
++            SymbolicValuePtr thisptr1_sym = SymbolicValue::treenode_instance(thisptr1);
++            if(sym_expr->can_be_equal(thisptr1_sym)){
++              //std::cout<<"Equal hai be! yeeess"<<std::endl;
++              std::string term = "sv_" + std::to_string(expr->hash());
++              std::string term1 = "sv_" + std::to_string(thisptr1->hash());
++              if (cpd.is_reg()) {
++                std::string regname = unparseX86Register(cpd.get_register(), NULL);
++                session->add_fact("possibleAssociationPtr",cd.get_address(), regname, target, term, term1);
++              }
++              else
++                session->add_fact("possibleAssociationPtr",cd.get_address(), std::to_string(cpd.get_num()), target, term, term1);
++            }
++          }
++        }
++      }
++    }
++  }
++
++  //Check for pass-by-value type of association
++
++  for (const ObjectUse& obj_use : boost::adaptors::values(ooa.object_uses)) {
++    rose_addr_t func_addr = obj_use.fd->get_address();
++
++    for (const ThisPtrUsage& tpu : boost::adaptors::values(obj_use.references)) {
++      // Report where this object was allocated.
++      if (tpu.alloc_type == AllocParameter) {
++        // Report relationships for the this-pointer later.
++        thisptrs.insert(tpu.this_ptr->get_expression());
++        // Report the allocation fact now though.
++        std::string thisptr_term = "sv_" + std::to_string(tpu.this_ptr->get_hash());
++        if(tpu.alloc_insn != NULL )
++          session->add_fact("possibleAssociationValue", tpu.alloc_insn->get_address(), func_addr,
++                            thisptr_term, "type_" + Enum2Str(tpu.alloc_type), tpu.alloc_size);
++        else
++          session->add_fact("possibleAssociationValue", -1, func_addr,
++                            thisptr_term, "type_" + Enum2Str(tpu.alloc_type), tpu.alloc_size);
++      }
++
++    }
++  }
++
++}
++
+ // Wrap the private API to dump the Prolog facts in a try/catch wrapper.
+ bool
+ OOSolver::dump_facts()
+@@ -732,6 +984,7 @@ OOSolver::dump_facts_private()
+   exported += session->print_predicate(facts_file, "thisCallMethod", 3);
+   exported += session->print_predicate(facts_file, "funcOffset", 4);
+   exported += session->print_predicate(facts_file, "methodMemberAccess", 4);
++  exported += session->print_predicate(facts_file, "methodMemberWrite", 6);
+   exported += session->print_predicate(facts_file, "possibleVFTableWrite", 4);
+   exported += session->print_predicate(facts_file, "possibleVBTableWrite", 4);
+   exported += session->print_predicate(facts_file, "initialMemory", 2);
+@@ -753,6 +1006,14 @@ OOSolver::dump_facts_private()
+   exported += session->print_predicate(facts_file, "callParameter", 4);
+   exported += session->print_predicate(facts_file, "callReturn", 4);
+   exported += session->print_predicate(facts_file, "callTarget", 3);
++  exported += session->print_predicate(facts_file, "possibleEmbeddedObjectPtr", 2);
++  exported += session->print_predicate(facts_file, "possibleAssociationValue", 5);
++  exported += session->print_predicate(facts_file, "possibleAssociationPtr", 5);
++  exported += session->print_predicate(facts_file, "thisPtrEquivalence", 2);
++  exported += session->print_predicate(facts_file, "termDebug", 2);
++  exported += session->print_predicate(facts_file, "std_push_back_meth", 1);
++  exported += session->print_predicate(facts_file, "std_insert_meth", 1);
++  exported += session->print_predicate(facts_file, "std_ucitr_meth", 1);
+ 
+   facts_file << "% Object fact exporting complete." << std::endl;
+   facts_file.close();
+@@ -800,6 +1061,18 @@ OOSolver::dump_results_private()
+   exported += session->print_predicate(results_file, "finalMember", 4);
+   exported += session->print_predicate(results_file, "finalMemberAccess", 4);
+   exported += session->print_predicate(results_file, "finalMethodProperty", 3);
++  exported += session->print_predicate(results_file, "finalMemberWrite", 4);
++  exported += session->print_predicate(results_file, "finalEmbeddedObjectPtr", 3);
++  exported += session->print_predicate(results_file, "finalAssociation", 5);
++  exported += session->print_predicate(results_file, "finalAssociation_ext", 5);
++  exported += session->print_predicate(results_file, "finalAssociation_ext_A", 5);
++  exported += session->print_predicate(results_file, "finalAssIntFact", 5);
++  exported += session->print_predicate(results_file, "finalAggregation", 5);
++  exported += session->print_predicate(results_file, "finalAggIntFact", 5);
++  exported += session->print_predicate(results_file, "finalAggregation_PB", 5);
++  exported += session->print_predicate(results_file, "finalComposition", 3);
++  exported += session->print_predicate(results_file, "possibleAdapter", 3);
++  exported += session->print_predicate(results_file, "possibleDecorator", 2);
+ 
+   results_file << "% Object detection reporting complete." << std::endl;
+   results_file.close();
+@@ -1238,15 +1511,15 @@ SolveResolvedVirtualCallFromProlog::solve(std::vector<OOClassDescriptorPtr>& cla
+           if (vcall_cd) {
+             vftcall->add_virtual_call(vcall_cd, to_addr);
+ 
+-            OINFO << "Added virtual function call for " << cls->get_name()
+-                  << " in vftable " << addr_str(vftcall->get_address())
+-                  << " from=" << addr_str(vcall_cd->get_address())
+-                  << ", to=" << addr_str(to_addr) << LEND;
++            GDEBUG << "Added virtual function call for " << cls->get_name()
++                   << " in vftable " << addr_str(vftcall->get_address())
++                   << " from=" << addr_str(vcall_cd->get_address())
++                   << ", to=" << addr_str(to_addr) << LEND;
+           } else {
+-            OINFO << "Could not add virtual function call from="
+-                  << addr_str(from_addr)
+-                  << ", to=" << addr_str(to_addr)
+-                  << " due to invalid call descriptor" << LEND;
++            GDEBUG << "Could not add virtual function call from="
++                   << addr_str(from_addr)
++                   << ", to=" << addr_str(to_addr)
++                   << " due to invalid call descriptor" << LEND;
+           }
+         }
+       }
+@@ -1256,6 +1529,142 @@ SolveResolvedVirtualCallFromProlog::solve(std::vector<OOClassDescriptorPtr>& cla
+   return true;
+ }
+ 
++bool
++SolveCompositionFromProlog::solve(std::vector<OOClassDescriptorPtr>& classes) {
++
++  rose_addr_t out_cid, emb_cid;
++  size_t emb_off;
++  std::cout<<"In solve composition"<<std::endl;
++  OOClassDescriptorPtr outer=NULL, embedded=NULL;
++  auto emb_obj_query = session_->query("finalComposition",
++                                      var(out_cid),
++                                      any(),
++                                      var(emb_cid));
++
++  while (!emb_obj_query->done()) {
++        // look up the outer class by id
++/*    auto oit = std::find_if(classes.begin(),
++                            classes.end(),
++                            [out_cid](OOClassDescriptorPtr cls)
++                            { return out_cid == cls->get_id(); });
++
++    if (oit != classes.end()) {
++      outer = *oit;
++    }
++
++    // look up the embedded class by id
++    auto eit = std::find_if(classes.begin(),
++                                 classes.end(),
++                                 [emb_cid](OOClassDescriptorPtr cls)
++                                 { return emb_cid == cls->get_id(); });
++
++    if (eit != classes.end()) {
++      embedded = *eit;
++    }
++
++    if (outer && embedded) {
++      OOElementPtr emb_elm = embedded;
++      outer->add_member(emb_off, emb_elm);
++
++      GDEBUG << "Adding embedded object member " << emb_elm->get_name()
++             << " to " << outer->get_name() << "@ " << addr_str(emb_off) << LEND;
++
++  }*/
++  	emb_obj_query->next();
++  }
++
++  std::cout<<"Solve composition done!"<<std::endl;
++  return true;
++}
++
++bool
++SolveAssociationFromProlog::solve(std::vector<OOClassDescriptorPtr>& classes) {
++
++  rose_addr_t out_cid, emb_cid, meth_id, certainity;
++  size_t emb_off;
++  std::string param_loc;
++  std::cout<<"In solve association"<<std::endl;
++  OOClassDescriptorPtr outer=NULL, embedded=NULL;
++  auto ass_int_query = session_->query("finalAssociation_int",
++                                      var(out_cid),
++                                      any(),
++                                      any(),
++                                      var(emb_cid), any());
++
++  while (!ass_int_query->done()) {
++    ass_int_query->next();
++  }
++
++  std::cout<<"solve association, internal done!"<<std::endl;
++
++  auto ass_export_query = session_->query("exportFinalAss",
++                                      any(),
++                                      any(),
++                                      any());
++
++  while (!ass_export_query->done()) {
++    ass_export_query->next();
++  }
++
++  auto ass_ext_query = session_->query("finalAssociation_ext",
++                                      var(out_cid),
++                                      any(),
++                                      any(),
++                                      var(emb_cid), any());
++
++  while (!ass_ext_query->done()) {
++    ass_ext_query->next();
++  }
++
++  std::cout<<"solve association, external done!"<<std::endl;
++
++  auto ass_query = session_->query("finalAssociation",
++                                      var(out_cid),
++                                      any(),
++                                      any(),
++                                      var(emb_cid), any());
++
++  while (!ass_query->done()) {
++    ass_query->next();
++  }
++
++  return true;
++}
++
++bool
++SolveAggregationFromProlog::solve(std::vector<OOClassDescriptorPtr>& classes) {
++
++  rose_addr_t out_cid, emb_cid, temp1, temp2, emb_off;
++
++  std::cout<<"In export Internal aggregation"<<std::endl;
++
++  auto agg_export_query = session_->query("exportFinalAgg",
++                                      any(),
++                                      any(),
++                                      any());
++
++  while (!agg_export_query->done()) {
++    agg_export_query->next();
++  }
++
++  std::cout<<"In solve aggregation"<<std::endl;
++  OOClassDescriptorPtr outer=NULL, embedded=NULL;
++  auto emb_obj_query = session_->query("finalAggregation",
++                                      var(out_cid),
++                                      any(),
++                                      any(),
++                                      any(),
++                                      var(emb_cid));
++
++  while (!emb_obj_query->done()) {
++  	//Do nothing for now	
++  	emb_obj_query->next();
++  }
++
++  std::cout<<"solve aggregation done"<<std::endl;
++  return true;
++}
++
+ // Because the entire OO analysis is read-only with respect to the descriptor set until we
+ // discover some new targets for some virtual function calls, we need a separate method (this
+ // one) to _update_ a descriptor set with the the new call targets.
+@@ -1324,6 +1733,18 @@ OOSolver::import_results() {
+       = std::make_shared<SolveResolvedVirtualCallFromProlog>(session, ds);
+     runner.add_pass(final_vcall);
+ 
++    std::shared_ptr<OOSolverAnalysisPass> final_Ass
++      = std::make_shared<SolveAssociationFromProlog>(session, ds);
++    runner.add_pass(final_Ass);
++
++    std::shared_ptr<OOSolverAnalysisPass> final_Agg
++      = std::make_shared<SolveAggregationFromProlog>(session, ds);
++    runner.add_pass(final_Agg);
++
++    std::shared_ptr<OOSolverAnalysisPass> final_Comp
++      = std::make_shared<SolveCompositionFromProlog>(session, ds);
++    runner.add_pass(final_Comp);
++
+     GINFO << "Ingesting prolog results ... " << LEND;
+     runner.run();
+     GINFO << "Done!" << LEND;
+diff --git a/libpharos/oosolver.hpp b/libpharos/oosolver.hpp
+old mode 100644
+new mode 100755
+index 3626e75..0856689
+--- a/libpharos/oosolver.hpp
++++ b/libpharos/oosolver.hpp
+@@ -8,6 +8,7 @@
+ #include <Sawyer/ProgressBar.h>
+ 
+ #include "prolog.hpp"
++#include "method.hpp"
+ 
+ namespace pharos {
+ 
+@@ -136,6 +137,44 @@ class SolveResolvedVirtualCallFromProlog : public OOSolverAnalysisPass {
+   virtual bool solve(std::vector<OOClassDescriptorPtr>& classes);
+ };
+ 
++// For infering association
++class SolveAssociationFromProlog : public OOSolverAnalysisPass {
++ private:
++  std::shared_ptr<prolog::Session> session_;
++  const DescriptorSet& ds;
++ public:
++  SolveAssociationFromProlog(std::shared_ptr<prolog::Session> s, const DescriptorSet& ds_)
++    : session_(s), ds(ds_) {
++    set_name("SolveAssociationFromProlog");
++  }
++  virtual bool solve(std::vector<OOClassDescriptorPtr>& classes);
++};
++
++// For infering aggregation
++class SolveAggregationFromProlog : public OOSolverAnalysisPass {
++ private:
++  std::shared_ptr<prolog::Session> session_;
++  const DescriptorSet& ds;
++ public:
++  SolveAggregationFromProlog(std::shared_ptr<prolog::Session> s, const DescriptorSet& ds_)
++    : session_(s), ds(ds_) {
++    set_name("SolveAggregationFromProlog");
++  }
++  virtual bool solve(std::vector<OOClassDescriptorPtr>& classes);
++};
++
++// For infering composition
++class SolveCompositionFromProlog : public OOSolverAnalysisPass {
++ private:
++  std::shared_ptr<prolog::Session> session_;
++  const DescriptorSet& ds;
++ public:
++  SolveCompositionFromProlog(std::shared_ptr<prolog::Session> s, const DescriptorSet& ds_)
++    : session_(s), ds(ds_) {
++    set_name("SolveCompositionFromProlog");
++  }
++  virtual bool solve(std::vector<OOClassDescriptorPtr>& classes);
++};
+ // End analysis/solve passes
+ 
+ // Forward declaration of OOAnalyzer
+@@ -156,11 +195,19 @@ private:
+   // For dumping Prolog facts to files (if requested) for testing.
+   std::string facts_filename;
+   std::string results_filename;
++  std::string exports_filename;
+ 
+   // A set of unique tree nodes representing this-pointers that
+   // we should report relationships for.
+   TreeNodePtrSet thisptrs;
+ 
++  // A set of all this_call_methods along with their thunks
++  std::set<rose_addr_t> possible_this_call_meth;
++
++  // Keep a set of all data member writes, which will later to be used
++  // for extracting composition relationships
++  std::vector<pharos::Member_usage> memberWrite;
++
+   // list of created classes
+   std::vector<OOClassDescriptorPtr> classes;
+ 
+@@ -199,6 +246,9 @@ private:
+   void add_thisptr_facts();
+   void add_function_facts(const OOAnalyzer& ooa);
+   void add_import_facts(const OOAnalyzer& ooa);
++  void add_composition_facts(const OOAnalyzer& ooa);
++  void add_association_facts(const OOAnalyzer& ooa);
++  void add_aggregation_facts(const OOAnalyzer& ooa);
+ 
+   // Private implementation of dump_facts() and dump_results().
+   void dump_facts_private();
