@@ -1,0 +1,14 @@
+# How to read and reproduce the ground truth?
+
+For every benchmark, we have open-sourced the ground truth in the form of a spread-sheet(XLSX). First sheet of this XLSX file contains the functions present in the DLL, their parameter types and possible class relationships. We manually retrieved this information using PDB file(for binary to source mapping) and the source code of the benchmark. On the second sheet, we have reported the detected Association class relationships and have mentioned whether they are correct or not. Reported association relationships are of the form: finalAssociation(Adopter, Function_location, Param_location, Adoptee, Certainity). Similarly, on the third and fourth sheet, we have reported the detected Aggregation and composition relationships.
+
+# How to verify the ground truth and our results?
+
+Easiest way to verify any class relationship is to look that up in the source code. However, this might not always work and you may need to reverse-engineer a given function from the DLL. Here's how you can do it:<br><br>
+	1) Download and Install Radare2 and open the DLL file using "r2 dll_name.dll"<br>
+	2) Now load the pdb file using "idp pbd_fine_name.pdb"<br>
+	3) Search the loaded PDB file for the function address, func_addr, and its corresponding name in the source code using "idpi | grep 'this_call' | grep func_addr".<br>
+	4) Look up the source code for the function name and its parent class declaration and definition.<br>
+	5) As an alternative to looking-up in the source code, you can use "pdd @ func_add" to represent the function assembly in a more readable, functionally-equivalent form. Note that in order to use the pdd command, you need to install a Radare2 plugin "ret2dec".<br><br>
+We have used the PDB file only for the extraction of ground truth and is not required for CLARE to work. Also, as mentioned in the paper, we have not included the relationships between the classes which were not in the source-code like STL related, Imports etc. We have explicitly mentioned this in our XLSX files infront of the function name. Moreover, we haven't taken into account reflexive association, aggregation and composition relationships(as mentioned in paper, section 3A).
+
